@@ -1,0 +1,19 @@
+.window {
+	background: transparent;
+}
+
+.container {
+	background: green;
+	min-height: 24px;
+	padding: 0 16px;
+}
+
+.test {
+	color: pink;
+}
+
+.currentApp {
+	.appIcon {
+		margin-right: 8px;
+	}
+}
