@@ -1,19 +1,21 @@
 {
-  "$schema": "https://json.schemastore.org/tsconfig",
-  "compilerOptions": {
-    "jsx": "react-jsx",
-    "jsxImportSource": "ags/gtk4",
-    "lib": [
-      "ES2023",
-      "DOM"
-    ],
-    "module": "ES2022",
-    "moduleResolution": "Bundler",
-    "strict": true,
-    "target": "ES2020"
-  },
-  "include": [
-    "src/**/*",
-    "@girs/**/*"
-  ]
+	"$schema": "https://json.schemastore.org/tsconfig",
+	"compilerOptions": {
+		"jsx": "react-jsx",
+		"jsxImportSource": "ags/gtk4",
+		"lib": ["ES2023", "DOM"],
+		"module": "ES2022",
+		"moduleResolution": "Bundler",
+		"strict": true,
+		"target": "ES2020",
+		"baseUrl": "./src",
+		"paths": {
+			"@interface/*": ["shared/interfaces/*.interface"],
+			"@util/*": ["shared/utils/*.util"],
+			"@icon/*": ["shared/icons/*.icon"],
+			"@styles/*": ["shared/styles/*.global.style"],
+			"@components/*": ["shared/components/*.component"]
+		}
+	},
+	"include": ["src/**/*", "@girs/**/*"]
 }

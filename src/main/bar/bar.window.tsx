@@ -1,20 +1,33 @@
 import { Astal, Gdk } from "ags/gtk4";
-import { CLASS } from "../../../constants/class.const";
+import { CLASS } from "constants/class.const";
 import styles from "./bar.window.style";
 import app from "ags/gtk4/app";
-import { WifiWidget } from "../../../widgets/wifi/wifi.widget";
 import AstalHyprland from "gi://AstalHyprland?version=0.1";
 import { createBinding } from "gnim";
 import { With } from "ags";
-import { getIconForWindow } from "../../../utils/icon.util";
-import { getReleaseInfo } from "../../../utils/release-info.util";
+import { getWindowIcon } from "@util/icon";
+import { getReleaseInfo } from "@util/release-info";
 import GLib from "gi://GLib?version=2.0";
+import { ClockBarWidget } from "main/bar/widgets/clock/clock.bar-widget";
+import { VolumeBarWidget } from "main/bar/widgets/volume/volume.bar-widget";
+import { BluetoothBarWidget } from "main/bar/widgets/bluetooth/bluetooth.bar-widget";
+import { NetworkBarWidget } from "main/bar/widgets/network/network.bar-widget";
+import { toggleMenu } from "main/menu/menu.manager";
+import { AudioMenuHandler } from "main/menu/handlers/audio/audio.menu-handler";
+import { NetworkMenuHandler } from "main/menu/handlers/network/network.menu-handler";
 
 export function BarWindow(gdkMonitor: Gdk.Monitor) {
 	const { TOP, LEFT, RIGHT } = Astal.WindowAnchor;
 
-	const hyprland = AstalHyprland.get_default();
+	const RIGHT_WIDGETS = [
+		// <label label="❤️" />,
+		<VolumeBarWidget onClicked={() => toggleMenu(AudioMenuHandler)} />,
+		<BluetoothBarWidget />,
+		<NetworkBarWidget onClicked={() => toggleMenu(NetworkMenuHandler)} />,
+		<ClockBarWidget />,
+	] as const;
 
+	const hyprland = AstalHyprland.get_default();
 	const focusedClient = createBinding(hyprland, "focusedClient");
 
 	return (
@@ -27,9 +40,10 @@ export function BarWindow(gdkMonitor: Gdk.Monitor) {
 			exclusivity={Astal.Exclusivity.EXCLUSIVE}
 			anchor={TOP | LEFT | RIGHT}
 			application={app}
+			namespace={CLASS}
 		>
 			<box cssClasses={[styles.container]}>
-				<centerbox>
+				<centerbox hexpand>
 					<box $type="start" hexpand>
 						<With value={focusedClient}>
 							{(client: AstalHyprland.Client | null) => {
@@ -48,7 +62,7 @@ export function BarWindow(gdkMonitor: Gdk.Monitor) {
 										</box>
 									);
 								}
-								const icon = getIconForWindow(client.class);
+								const icon = getWindowIcon(client.class);
 
 								return (
 									<box cssClasses={[styles.currentApp]}>
@@ -62,7 +76,9 @@ export function BarWindow(gdkMonitor: Gdk.Monitor) {
 						</With>
 					</box>
 					<box $type="end">
-						<WifiWidget />
+						{RIGHT_WIDGETS.map((widget) => (
+							<box>{widget}</box>
+						))}
 					</box>
 				</centerbox>
 			</box>

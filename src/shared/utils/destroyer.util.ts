@@ -1,5 +1,3 @@
-import GObject from "gnim/gobject";
-
 interface Disconnectable {
 	disconnect(id: number): void;
 }

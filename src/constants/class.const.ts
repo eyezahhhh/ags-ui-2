@@ -1,1 +1,1 @@
-export const CLASS = "eyezah-ui"
+export const CLASS = "eyezah-ui-NEW";
