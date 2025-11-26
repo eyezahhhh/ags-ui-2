@@ -15,6 +15,7 @@ import { NetworkBarWidget } from "main/bar/widgets/network/network.bar-widget";
 import { toggleMenu } from "main/menu/menu.manager";
 import { AudioMenuHandler } from "main/menu/handlers/audio/audio.menu-handler";
 import { NetworkMenuHandler } from "main/menu/handlers/network/network.menu-handler";
+import { BluetoothMenuHandler } from "main/menu/handlers/bluetooth/bluetooth.menu-handler";
 
 export function BarWindow(gdkMonitor: Gdk.Monitor) {
 	const { TOP, LEFT, RIGHT } = Astal.WindowAnchor;
@@ -22,7 +23,7 @@ export function BarWindow(gdkMonitor: Gdk.Monitor) {
 	const RIGHT_WIDGETS = [
 		// <label label="❤️" />,
 		<VolumeBarWidget onClicked={() => toggleMenu(AudioMenuHandler)} />,
-		<BluetoothBarWidget />,
+		// <BluetoothBarWidget onClicked={() => toggleMenu(BluetoothMenuHandler)} />,
 		<NetworkBarWidget onClicked={() => toggleMenu(NetworkMenuHandler)} />,
 		<ClockBarWidget />,
 	] as const;

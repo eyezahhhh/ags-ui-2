@@ -12,6 +12,7 @@ const reloadStyles = createDebouncer(() => {
 
 app.start({
 	css: "./astal-style.css",
+	iconTheme: "Papirus",
 	main: () => {
 		const monitors = app.get_monitors();
 		for (const monitor of monitors) {

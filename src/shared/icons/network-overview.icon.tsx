@@ -1,8 +1,8 @@
-import { IIconProps } from "@interface/icon-props";
+import { IconProps } from "@interface/icon-props";
 import { getNetworkOverviewIcon } from "@util/icon";
 import { onCleanup } from "gnim";
 
-interface Props extends IIconProps {}
+interface Props extends IconProps {}
 
 export function NetworkOverviewIcon({ cssClasses, iconSize }: Props) {
 	const { icon, cleanup } = getNetworkOverviewIcon();

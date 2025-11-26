@@ -1,6 +1,6 @@
 import { Gtk } from "ags/gtk4";
 
-export interface IIconProps {
+export interface IconProps {
 	cssClasses?: string[];
 	iconSize?: Gtk.IconSize;
 }

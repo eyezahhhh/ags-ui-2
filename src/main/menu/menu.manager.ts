@@ -4,6 +4,7 @@ import { IMenuHandlerState } from "@interface/menu-handler-state";
 import { MenuHandler } from "./handlers/menu-handler";
 import { AudioMenuHandler } from "./handlers/audio/audio.menu-handler";
 import { NetworkMenuHandler } from "./handlers/network/network.menu-handler";
+import { BluetoothMenuHandler } from "./handlers/bluetooth/bluetooth.menu-handler";
 
 const [activeHandler, setActiveHandler] = createState<IMenuHandlerState>({
 	handler: null,
@@ -60,4 +61,5 @@ export function getActiveHandlerStateAccessor() {
 export const MENU_HANDLERS: MenuHandler[] = [
 	new AudioMenuHandler(),
 	new NetworkMenuHandler(),
+	new BluetoothMenuHandler(),
 ] as const;

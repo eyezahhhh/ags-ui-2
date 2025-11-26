@@ -3,6 +3,8 @@ import AstalApps from "gi://AstalApps?version=0.1";
 import AstalNetwork from "gi://AstalNetwork?version=0.1";
 import { createState } from "gnim";
 import { Destroyer } from "./destroyer.util";
+import NM from "gi://NM?version=1.0";
+import { interval } from "ags/time";
 
 // todo: make this controllable from nixos
 const ICON_ALIASES: Record<string, string> = {
@@ -62,30 +64,32 @@ export function getNetworkOverviewIcon() {
 	};
 
 	let wiredCleanup: (() => void) | null = null;
+	const createWiredListener = () => {
+		wiredCleanup?.();
+		if (network.wired) {
+			const connectionId = network.wired.connect("notify", update);
+			wiredCleanup = () => network.wired.disconnect(connectionId);
+		}
+	};
 	destroyer.addDisconnect(
 		network,
-		network.connect("notify::wired", () => {
-			console.log("Wired update");
-			wiredCleanup?.();
-			if (network.wired) {
-				wiredCleanup = () =>
-					network.wired.disconnect(network.wired.connect("notify", update));
-			}
-		}),
+		network.connect("notify::wired", createWiredListener),
 	);
+	createWiredListener();
 
 	let wifiCleanup: (() => void) | null = null;
+	const createWifiListener = () => {
+		wifiCleanup?.();
+		if (network.wifi) {
+			const connectionId = network.wifi.connect("notify", update);
+			wifiCleanup = () => network.wifi.disconnect(connectionId);
+		}
+	};
 	destroyer.addDisconnect(
 		network,
-		network.connect("notify::wifi", () => {
-			console.log("Wifi update");
-			wifiCleanup?.();
-			if (network.wifi) {
-				wifiCleanup = () =>
-					network.wifi.disconnect(network.wifi.connect("notify", update));
-			}
-		}),
+		network.connect("notify::wifi", createWifiListener),
 	);
+	createWifiListener();
 
 	update();
 
