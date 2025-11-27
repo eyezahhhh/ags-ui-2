@@ -4,7 +4,6 @@ import AstalWp from "gi://AstalWp?version=0.1";
 import { createBinding, createComputed, For } from "gnim";
 import { Gtk } from "ags/gtk4";
 import styles from "./audio.menu-handler.style";
-import { cc } from "@util/string";
 import { getValidIcon } from "@util/icon";
 import sliderStyles from "@styles/slider";
 import { ClickableListEntry } from "@components/clickable-list-entry/clickable-list-entry";

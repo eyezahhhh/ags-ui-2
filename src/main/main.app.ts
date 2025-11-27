@@ -3,6 +3,7 @@ import { monitorFile } from "ags/file";
 import { createDebouncer } from "@util/time";
 import { BarWindow } from "./bar/bar.window";
 import { MenuWindow } from "./menu/menu.window";
+import { CLASS } from "constants/class.const";
 
 const reloadStyles = createDebouncer(() => {
 	app.reset_css();
@@ -12,7 +13,8 @@ const reloadStyles = createDebouncer(() => {
 
 app.start({
 	css: "./astal-style.css",
-	iconTheme: "Papirus",
+	// iconTheme: "Papirus",
+	instanceName: `${CLASS}_main`,
 	main: () => {
 		const monitors = app.get_monitors();
 		for (const monitor of monitors) {

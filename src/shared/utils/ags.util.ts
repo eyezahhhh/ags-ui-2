@@ -1,3 +1,4 @@
+import { Gdk } from "ags/gtk4";
 import { Accessor, createState } from "gnim";
 
 export function optionalAs<T, V>(
@@ -23,4 +24,10 @@ export function asAccessor<T>(value: T | Accessor<T>) {
 	}
 	const [accessor] = createState(value);
 	return accessor;
+}
+
+export function createCursorPointer() {
+	return new Gdk.Cursor({
+		name: "pointer"
+	});
 }

@@ -2,7 +2,7 @@ import { Accessor, With } from "gnim";
 import styles from "./clickable-list-entry.style";
 import { cc } from "@util/string";
 import { optionalAs } from "@util/ags";
-import { Gtk } from "ags/gtk4";
+import { Gdk, Gtk } from "ags/gtk4";
 import { WithOptional } from "@components/with-optional/with-optional";
 
 interface Props {
@@ -12,6 +12,7 @@ interface Props {
 	iconName?: string | Accessor<string>;
 	active?: boolean | Accessor<boolean>;
 	onClicked?: () => void;
+	cursor?: Gdk.Cursor | Accessor<Gdk.Cursor>
 }
 
 export function ClickableListEntry({
@@ -21,6 +22,7 @@ export function ClickableListEntry({
 	iconName,
 	active,
 	onClicked,
+	cursor
 }: Props) {
 	return (
 		<button
@@ -28,6 +30,7 @@ export function ClickableListEntry({
 				cc(styles.button, active && styles.active),
 			)}
 			onClicked={onClicked}
+			cursor={cursor}
 		>
 			<box>
 				<box>

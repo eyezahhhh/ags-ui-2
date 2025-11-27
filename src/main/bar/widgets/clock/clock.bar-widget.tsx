@@ -1,6 +1,7 @@
 import { createPoll } from "ags/time";
 import GLib from "gi://GLib?version=2.0";
 import styles from "./clock.bar-widget.style";
+import { createCursorPointer } from "@util/ags";
 
 interface Props {
 	seconds?: boolean;
@@ -13,7 +14,7 @@ export function ClockBarWidget({ seconds, onClicked }: Props) {
 	});
 
 	return (
-		<button onClicked={onClicked} cssClasses={[styles.button]}>
+		<button onClicked={onClicked} cssClasses={[styles.button]} cursor={createCursorPointer()}>
 			<label label={time} />
 		</button>
 	);

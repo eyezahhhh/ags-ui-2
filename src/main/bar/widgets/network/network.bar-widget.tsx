@@ -1,5 +1,6 @@
 import { NetworkOverviewIcon } from "@icon/network-overview";
 import styles from "./network.bar-widget.style";
+import { createCursorPointer } from "@util/ags";
 
 interface Props {
 	onClicked?: () => void;
@@ -7,7 +8,7 @@ interface Props {
 
 export function NetworkBarWidget({ onClicked }: Props) {
 	return (
-		<button cssClasses={[styles.button]} onClicked={onClicked}>
+		<button cssClasses={[styles.button]} onClicked={onClicked} cursor={createCursorPointer()}>
 			<NetworkOverviewIcon />
 		</button>
 	);

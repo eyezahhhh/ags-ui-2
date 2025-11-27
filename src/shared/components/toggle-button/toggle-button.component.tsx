@@ -1,6 +1,6 @@
-import { asAccessor, getOptional } from "@util/ags";
+import { asAccessor, createCursorPointer, getOptional } from "@util/ags";
 import { cc } from "@util/string";
-import { Gtk } from "ags/gtk4";
+import { Gdk, Gtk } from "ags/gtk4";
 import { Accessor, createComputed } from "gnim";
 import styles from "./toggle-button.component.style";
 import GObject from "gnim/gobject";
@@ -29,22 +29,7 @@ export function ToggleButton(
 						disabled && styles.disabled,
 					),
 			)}
+			cursor={createCursorPointer()}
 		/>
 	);
-
-	// return Button({
-	// 	...props,
-	// 	cssName: props.cssName || "iconbutton",
-	// 	cssClasses: bind(
-	// 		Variable.derive(
-	// 			[
-	// 				toBinding(props.active),
-	// 				toBinding(props.cssClasses),
-	// 				toBinding(props.disabled),
-	// 			],
-	// 			(active, classes, disabled) =>
-	// 				cc(...(classes || []), active && "active", disabled && "disabled"),
-	// 		),
-	// 	),
-	// });
 }

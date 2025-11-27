@@ -1,6 +1,6 @@
 import { ClickableListEntry } from "@components/clickable-list-entry/clickable-list-entry";
 import { WithOptional } from "@components/with-optional/with-optional";
-import { getOptional, optionalAs } from "@util/ags";
+import { createCursorPointer, getOptional, optionalAs } from "@util/ags";
 import { Destroyer } from "@util/destroyer";
 import { connectToWifi, getConnectingWifiAccessor } from "@util/network";
 import { Gtk } from "ags/gtk4";
@@ -17,6 +17,8 @@ import {
 import styles from "./access-point.component.style";
 import { setMenu } from "main/menu/menu.manager";
 import { NetworkMenuHandler } from "main/menu/handlers/network/network.menu-handler";
+import { ToggleButton } from "@components/toggle-button/toggle-button";
+import { cc } from "@util/string";
 
 interface Props {
 	ap: AstalNetwork.AccessPoint | Accessor<AstalNetwork.AccessPoint>;
@@ -45,11 +47,11 @@ export function AccessPoint({ ap, onClicked, isOpen }: Props) {
 		connectToWifi(
 			getOptional(ap),
 			password ||
-				(() => {
-					if (getOptional(isOpen)) {
-						setShowWifiPasswordEntry(true);
-					}
-				}),
+			(() => {
+				if (getOptional(isOpen)) {
+					setShowWifiPasswordEntry(true);
+				}
+			}),
 		).catch((e) => {
 			console.error(e);
 		});
@@ -60,6 +62,8 @@ export function AccessPoint({ ap, onClicked, isOpen }: Props) {
 			{(ap) => (
 				<box orientation={Gtk.Orientation.VERTICAL}>
 					<ClickableListEntry
+						cursor={createCursorPointer()}
+						active={createBinding(network.wifi, "active_access_point").as((activeAP) => activeAP == ap)}
 						label={createComputed(
 							[createBinding(ap, "ssid"), createBinding(ap, "bssid")],
 							(ssid, bssid) => ssid || bssid,
@@ -112,52 +116,48 @@ export function AccessPoint({ ap, onClicked, isOpen }: Props) {
 							}
 						>
 							{({ isActive, showPasswordEntry, remoteConnection }) =>
-								showPasswordEntry ? (
-									<box>
-										<entry
-											placeholderText="WiFi Password"
-											hexpand
-											visibility={false}
-											onMap={(self) => self.grab_focus()}
-											onActivate={(self) => connectToAccessPoint(self.text)}
-										/>
-									</box>
-								) : (
-									<box cssClasses={[styles.revealer]}>
-										<button
-											hexpand
-											onClicked={() => {
-												if (isActive) {
-													network.wifi?.device.disconnect_async(
-														null,
-														(device, result) => {
-															device?.disconnect_finish(result);
-														},
-													);
-												} else {
-													connectToAccessPoint();
-												}
-											}}
-										>
-											<box hexpand>
-												<label
-													hexpand
-													label={isActive ? "Disconnect" : "Connect"}
-												/>
-											</box>
-										</button>
-										{remoteConnection && (
-											<>
-												<button
-													onClicked={() =>
-														setMenu(NetworkMenuHandler, `qrcode_${ap.ssid}`)
+								<box cssClasses={[styles.revealerInner]}>
+									{showPasswordEntry ? (
+										<box>
+											<entry
+												placeholderText="WiFi Password"
+												hexpand
+												visibility={false}
+												onMap={(self) => self.grab_focus()}
+												onActivate={(self) => connectToAccessPoint(self.text)}
+											/>
+										</box>
+									) : (
+										<box cssClasses={[styles.revealer]}>
+											<button
+												cursor={createCursorPointer()}
+												hexpand
+												onClicked={() => {
+													if (isActive) {
+														network.wifi?.device.disconnect_async(
+															null,
+															(device, result) => {
+																device?.disconnect_finish(result);
+															},
+														);
+													} else {
+														connectToAccessPoint();
 													}
-													cssClasses={[styles.extraButton]}
-												>
-													<image iconName="emblem-shared-symbolic" />
-												</button>
-												<button
-													onClicked={() => {
+												}}
+											>
+												<box hexpand>
+													<label
+														hexpand
+														label={isActive ? "Disconnect" : "Connect"}
+													/>
+												</box>
+											</button>
+											{remoteConnection && (
+												<>
+													<ToggleButton onClicked={() => setMenu(NetworkMenuHandler, `qrcode_${ap.ssid}`)} cssClasses={[styles.extraButton]}>
+														<image iconName="emblem-shared-symbolic" />
+													</ToggleButton>
+													<ToggleButton onClicked={() => {
 														remoteConnection.delete_async(
 															null,
 															(_connection, result) => {
@@ -169,14 +169,14 @@ export function AccessPoint({ ap, onClicked, isOpen }: Props) {
 															},
 														);
 													}}
-													cssClasses={[styles.extraButton]}
-												>
-													<image iconName="edit-delete-symbolic" />
-												</button>
-											</>
-										)}
-									</box>
-								)
+														cssClasses={[styles.extraButton]}>
+														<image iconName="edit-delete-symbolic" />
+													</ToggleButton>
+												</>
+											)}
+										</box>
+									)}
+								</box>
 							}
 						</With>
 					</revealer>
