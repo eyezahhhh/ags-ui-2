@@ -43,6 +43,9 @@
   background: #fff;
   min-height: 6px;
 }
+.access-point-component-module__revealer___-3WIR .access-point-component-module__extraButton___8k2OH {
+  margin-left: 8px;
+}
 .clickable-list-entry-module__button___5GuG3 {
   all: unset;
   padding: 4px;
@@ -68,12 +71,12 @@
   margin-left: 24px;
 }
 .toggle-button-component-module__active___QxdH1 {
-  background: rgba(74, 74, 74, 0.7);
-  outline-color: rgba(74, 74, 74, 0.7);
+  outline-color: rgba(255, 0, 0, 0.7);
+  outline-width: 2px;
 }
 
 .toggle-button-component-module__disabled___F5Uq0 {
-  background: rgba(126, 126, 126, 0.5);
+  background: rgba(82, 82, 82, 0.5);
   color: #515151;
 }
 .bluetooth-bar-widget-module__button___ODGit {
@@ -114,7 +117,27 @@
 .network-menu-handler-module__wifiSectionButtons___79jQC .network-menu-handler-module__wifiSectionButton___BMKjZ {
   margin-right: 8px;
 }
+.time-menu-handler-module__date___-45nf .time-menu-handler-module__main___HJrDu {
+  font-family: "Oswald";
+  font-size: 2rem;
+  font-weight: 200;
+}
+.time-menu-handler-module__date___-45nf .time-menu-handler-module__aux___wPbvK {
+  font-family: "Roboto";
+  font-weight: 400;
+  line-height: 1rem;
+  padding-bottom: 0px;
+}
+.time-menu-handler-module__date___-45nf .time-menu-handler-module__aux___wPbvK .time-menu-handler-module__suffix___s9RLR {
+  margin-right: 6px;
+}
+.time-menu-handler-module__date___-45nf .time-menu-handler-module__aux___wPbvK .time-menu-handler-module__month___wxxW0 {
+  padding-left: 5px;
+  padding-right: 10px;
+}
 
-.network-menu-handler-module__accessPointRevealer___FSy8L .network-menu-handler-module__extraButton___5xsDX {
-  margin-left: 8px;
+.time-menu-handler-module__calendar___vqh-J {
+  background: transparent;
+  color: #1d1f1f;
+  border: none;
 }

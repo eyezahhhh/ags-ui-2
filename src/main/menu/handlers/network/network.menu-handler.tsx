@@ -3,21 +3,8 @@ import { MenuHandler } from "../menu-handler";
 import AstalNetwork from "gi://AstalNetwork?version=0.1";
 import styles from "./network.menu-handler.style";
 import { Gtk } from "ags/gtk4";
-import {
-	Accessor,
-	createBinding,
-	createComputed,
-	createState,
-	For,
-	onCleanup,
-	With,
-} from "gnim";
-import { ClickableListEntry } from "@components/clickable-list-entry/clickable-list-entry";
-import {
-	connectToWifi,
-	getConnectingWifiAccessor,
-	rescanWifi,
-} from "@util/network";
+import { Accessor, createBinding, createState, For, With } from "gnim";
+import { getRescanningWifiAccessor, rescanWifi } from "@util/network";
 import { createCommandProcess, doesCommandExist } from "@util/cli";
 import NM from "gi://NM?version=1.0";
 import GLib from "gi://GLib?version=2.0";
@@ -26,6 +13,8 @@ import { setMenu } from "main/menu/menu.manager";
 import { makeDirectoryRecursive } from "@util/file";
 import Gio from "gi://Gio?version=2.0";
 import Thumbnail from "@components/thumbnail/thumbnail";
+import { AccessPoint } from "@components/access-point/access-point";
+import { ToggleButton } from "@components/toggle-button/toggle-button";
 
 export class NetworkMenuHandler extends MenuHandler {
 	private qrCodeSupported = false;
@@ -240,34 +229,6 @@ export class NetworkMenuHandler extends MenuHandler {
 		const [openWifiNetwork, setOpenWifiNetwork] = createState<string | null>(
 			null,
 		);
-		const [showWifiPasswordEntry, setShowWifiPasswordEntry] =
-			createState(false);
-
-		const openWifiDispose = openWifiNetwork.subscribe(() => {
-			setShowWifiPasswordEntry(false);
-		});
-
-		const connectToAccessPoint = (
-			accessPoint: AstalNetwork.AccessPoint,
-			password?: string,
-		) => {
-			setShowWifiPasswordEntry(false);
-			connectToWifi(
-				accessPoint,
-				password ||
-				(() => {
-					if (openWifiNetwork.get() == accessPoint.bssid) {
-						setShowWifiPasswordEntry(true);
-					}
-				}),
-			).catch((e) => {
-				console.error(e);
-			});
-		};
-
-		onCleanup(() => {
-			openWifiDispose();
-		});
 
 		return (
 			<box orientation={Gtk.Orientation.VERTICAL} widthRequest={250}>
@@ -280,15 +241,24 @@ export class NetworkMenuHandler extends MenuHandler {
 						wifi ? (
 							<box orientation={Gtk.Orientation.VERTICAL}>
 								<box cssClasses={[styles.wifiSectionButtons]}>
-									<button cssClasses={[styles.wifiSectionButton]}>
-										<image iconName="network-wireless-symbolic" />
-									</button>
-									<button
+									<ToggleButton
+										disabled={createBinding(wifi, "enabled").as(
+											(enabled) => !enabled,
+										)}
+										onClicked={() =>
+											network.wifi.set_enabled(!network.wifi.enabled)
+										}
 										cssClasses={[styles.wifiSectionButton]}
-										onClicked={() => rescanWifi().catch(() => { })}
+									>
+										<image iconName="network-wireless-symbolic" />
+									</ToggleButton>
+									<ToggleButton
+										disabled={getRescanningWifiAccessor()}
+										onClicked={() => rescanWifi().catch(() => {})}
+										cssClasses={[styles.wifiSectionButton]}
 									>
 										<image iconName="view-refresh-symbolic" />
-									</button>
+									</ToggleButton>
 								</box>
 								<For
 									each={
@@ -298,167 +268,20 @@ export class NetworkMenuHandler extends MenuHandler {
 									}
 								>
 									{(accessPoint) => (
-										<box orientation={Gtk.Orientation.VERTICAL}>
-											<ClickableListEntry
-												label={createComputed(
-													[
-														createBinding(accessPoint, "ssid"),
-														createBinding(accessPoint, "bssid"),
-													],
-													(ssid, bssid) => ssid || bssid,
-												)}
-												subLabel={createComputed(
-													[
-														createBinding(
-															network.wifi,
-															"active_access_point",
-														),
-														getConnectingWifiAccessor(),
-													],
-													(activeAP, connectingAP) => {
-														if (connectingAP == accessPoint) {
-															return "Connecting...";
-														}
-														if (activeAP == accessPoint) {
-															return "Connected";
-														}
-														return null;
-													},
-												)}
-												endLabel={createBinding(accessPoint, "frequency").as(
-													(frequency) =>
-														`${Math.round(frequency / 100) / 10}Ghz`,
-												)}
-												iconName={createBinding(accessPoint, "icon_name")}
-												onClicked={() =>
+										<AccessPoint
+											ap={accessPoint}
+											onClicked={openWifiNetwork.as(
+												(openAP) => () =>
 													setOpenWifiNetwork(
-														openWifiNetwork.get() == accessPoint.bssid
+														openAP == accessPoint.bssid
 															? null
 															: accessPoint.bssid,
-													)
-												}
-											/>
-
-											<revealer
-												revealChild={openWifiNetwork.as(
-													(openNetwork) => openNetwork == accessPoint.bssid,
-												)}
-											>
-												<With
-													value={
-														createComputed(
-															[
-																createBinding(
-																	network.wifi,
-																	"active_access_point",
-																),
-																showWifiPasswordEntry,
-																createBinding(network.client, "connections"),
-															],
-															(
-																activeAP,
-																showPasswordEntry,
-																remoteConnections,
-															) => ({
-																isActive: activeAP == accessPoint,
-																showPasswordEntry,
-																remoteConnection: remoteConnections.find(
-																	(connection) =>
-																		connection.get_connection_type() ==
-																		"802-11-wireless" &&
-																		connection.get_id() == accessPoint.ssid,
-																),
-															}),
-														) as Accessor<{
-															isActive: boolean;
-															showPasswordEntry: boolean;
-															remoteConnection: NM.RemoteConnection | null;
-														}>
-													}
-												>
-													{({
-														isActive,
-														showPasswordEntry,
-														remoteConnection,
-													}) =>
-														showPasswordEntry ? (
-															<box>
-																<entry
-																	placeholderText="WiFi Password"
-																	hexpand
-																	visibility={false}
-																	onMap={(self) => self.grab_focus()}
-																	onActivate={(self) =>
-																		connectToAccessPoint(accessPoint, self.text)
-																	}
-																/>
-															</box>
-														) : (
-															<box cssClasses={[styles.accessPointRevealer]}>
-																<button
-																	hexpand
-																	onClicked={() => {
-																		if (isActive) {
-																			network.wifi?.device.disconnect_async(
-																				null,
-																				(device, result) => {
-																					device?.disconnect_finish(result);
-																				},
-																			);
-																		} else {
-																			connectToAccessPoint(accessPoint);
-																		}
-																	}}
-																>
-																	<box hexpand>
-																		<label
-																			hexpand
-																			label={
-																				isActive ? "Disconnect" : "Connect"
-																			}
-																		/>
-																	</box>
-																</button>
-																{remoteConnection && (
-																	<>
-																		<button
-																			onClicked={() =>
-																				setMenu(
-																					NetworkMenuHandler,
-																					`qrcode_${accessPoint.ssid}`,
-																				)
-																			}
-																			cssClasses={[styles.extraButton]}
-																		>
-																			<image iconName="emblem-shared-symbolic" />
-																		</button>
-																		<button
-																			onClicked={() => {
-																				remoteConnection.delete_async(
-																					null,
-																					(_connection, result) => {
-																						try {
-																							remoteConnection.delete_finish(
-																								result,
-																							);
-																						} catch (e) {
-																							console.error(e);
-																						}
-																					},
-																				);
-																			}}
-																			cssClasses={[styles.extraButton]}
-																		>
-																			<image iconName="edit-delete-symbolic" />
-																		</button>
-																	</>
-																)}
-															</box>
-														)
-													}
-												</With>
-											</revealer>
-										</box>
+													),
+											)}
+											isOpen={openWifiNetwork.as(
+												(openAP) => openAP == accessPoint.bssid,
+											)}
+										/>
 									)}
 								</For>
 							</box>
