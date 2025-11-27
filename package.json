@@ -3,7 +3,7 @@
 		"dev": "concurrently --kill-others-on-fail 'node styles.js' 'nodemon -e ts,tsx -i \"**/*.style.ts\" -x \"ags run -d . --gtk 4\"'",
 		"format:check": "prettier -c src",
 		"format:write": "prettier -w src",
-		"generate-types": "ags types -d . -u"
+		"generate-types": "npm ci && ags types -d . -u"
 	},
 	"dependencies": {
 		"ags": "*",

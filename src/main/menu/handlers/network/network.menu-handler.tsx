@@ -255,11 +255,11 @@ export class NetworkMenuHandler extends MenuHandler {
 			connectToWifi(
 				accessPoint,
 				password ||
-					(() => {
-						if (openWifiNetwork.get() == accessPoint.bssid) {
-							setShowWifiPasswordEntry(true);
-						}
-					}),
+				(() => {
+					if (openWifiNetwork.get() == accessPoint.bssid) {
+						setShowWifiPasswordEntry(true);
+					}
+				}),
 			).catch((e) => {
 				console.error(e);
 			});
@@ -285,7 +285,7 @@ export class NetworkMenuHandler extends MenuHandler {
 									</button>
 									<button
 										cssClasses={[styles.wifiSectionButton]}
-										onClicked={() => rescanWifi().catch(() => {})}
+										onClicked={() => rescanWifi().catch(() => { })}
 									>
 										<image iconName="view-refresh-symbolic" />
 									</button>
@@ -299,48 +299,45 @@ export class NetworkMenuHandler extends MenuHandler {
 								>
 									{(accessPoint) => (
 										<box orientation={Gtk.Orientation.VERTICAL}>
-											<centerbox>
-												<ClickableListEntry
-													$type="start"
-													label={createComputed(
-														[
-															createBinding(accessPoint, "ssid"),
-															createBinding(accessPoint, "bssid"),
-														],
-														(ssid, bssid) => ssid || bssid,
-													)}
-													subLabel={createComputed(
-														[
-															createBinding(
-																network.wifi,
-																"active_access_point",
-															),
-															getConnectingWifiAccessor(),
-														],
-														(activeAP, connectingAP) => {
-															if (connectingAP == accessPoint) {
-																return "Connecting...";
-															}
-															if (activeAP == accessPoint) {
-																return "Connected";
-															}
-															return null;
-														},
-													)}
-													endLabel={createBinding(accessPoint, "frequency").as(
-														(frequency) =>
-															`${Math.round(frequency / 100) / 10}Ghz`,
-													)}
-													iconName={createBinding(accessPoint, "icon_name")}
-													onClicked={() =>
-														setOpenWifiNetwork(
-															openWifiNetwork.get() == accessPoint.bssid
-																? null
-																: accessPoint.bssid,
-														)
-													}
-												/>
-											</centerbox>
+											<ClickableListEntry
+												label={createComputed(
+													[
+														createBinding(accessPoint, "ssid"),
+														createBinding(accessPoint, "bssid"),
+													],
+													(ssid, bssid) => ssid || bssid,
+												)}
+												subLabel={createComputed(
+													[
+														createBinding(
+															network.wifi,
+															"active_access_point",
+														),
+														getConnectingWifiAccessor(),
+													],
+													(activeAP, connectingAP) => {
+														if (connectingAP == accessPoint) {
+															return "Connecting...";
+														}
+														if (activeAP == accessPoint) {
+															return "Connected";
+														}
+														return null;
+													},
+												)}
+												endLabel={createBinding(accessPoint, "frequency").as(
+													(frequency) =>
+														`${Math.round(frequency / 100) / 10}Ghz`,
+												)}
+												iconName={createBinding(accessPoint, "icon_name")}
+												onClicked={() =>
+													setOpenWifiNetwork(
+														openWifiNetwork.get() == accessPoint.bssid
+															? null
+															: accessPoint.bssid,
+													)
+												}
+											/>
 
 											<revealer
 												revealChild={openWifiNetwork.as(
@@ -368,7 +365,7 @@ export class NetworkMenuHandler extends MenuHandler {
 																remoteConnection: remoteConnections.find(
 																	(connection) =>
 																		connection.get_connection_type() ==
-																			"802-11-wireless" &&
+																		"802-11-wireless" &&
 																		connection.get_id() == accessPoint.ssid,
 																),
 															}),

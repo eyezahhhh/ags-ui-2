@@ -16,6 +16,7 @@ import { toggleMenu } from "main/menu/menu.manager";
 import { AudioMenuHandler } from "main/menu/handlers/audio/audio.menu-handler";
 import { NetworkMenuHandler } from "main/menu/handlers/network/network.menu-handler";
 import { BluetoothMenuHandler } from "main/menu/handlers/bluetooth/bluetooth.menu-handler";
+import { TimeMenuHandler } from "main/menu/handlers/time/time.menu-handler";
 
 export function BarWindow(gdkMonitor: Gdk.Monitor) {
 	const { TOP, LEFT, RIGHT } = Astal.WindowAnchor;
@@ -25,7 +26,7 @@ export function BarWindow(gdkMonitor: Gdk.Monitor) {
 		<VolumeBarWidget onClicked={() => toggleMenu(AudioMenuHandler)} />,
 		// <BluetoothBarWidget onClicked={() => toggleMenu(BluetoothMenuHandler)} />,
 		<NetworkBarWidget onClicked={() => toggleMenu(NetworkMenuHandler)} />,
-		<ClockBarWidget />,
+		<ClockBarWidget onClicked={() => toggleMenu(TimeMenuHandler)} />,
 	] as const;
 
 	const hyprland = AstalHyprland.get_default();

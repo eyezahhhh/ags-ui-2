@@ -30,43 +30,41 @@ export function ClickableListEntry({
 			onClicked={onClicked}
 		>
 			<box>
-				{iconName instanceof Accessor ? (
-					<With value={iconName}>
-						{(iconName) =>
-							iconName && (
-								<image iconName={iconName} cssClasses={[styles.icon]} />
-							)
-						}
-					</With>
-				) : (
-					iconName && <image iconName={iconName} cssClasses={[styles.icon]} />
-				)}
-				<centerbox hexpand>
-					<box
-						orientation={Gtk.Orientation.VERTICAL}
-						$type="start"
-						hexpand
-						valign={Gtk.Align.CENTER}
-					>
-						<label label={label} halign={Gtk.Align.START} />
-						<WithOptional value={subLabel}>
-							{(subLabel) => (
-								<box>
-									{subLabel && (
-										<label label={subLabel} cssClasses={[styles.subLabel]} />
-									)}
-								</box>
-							)}
-						</WithOptional>
-					</box>
-					<box $type="end">
-						<WithOptional value={endLabel}>
-							{(endLabel) => (
-								<box>{endLabel && <label label={endLabel} />}</box>
-							)}
-						</WithOptional>
-					</box>
-				</centerbox>
+				<box>
+					{iconName instanceof Accessor ? (
+						<With value={iconName}>
+							{(iconName) =>
+								iconName && (
+									<image iconName={iconName} cssClasses={[styles.icon]} />
+								)
+							}
+						</With>
+					) : (
+						iconName && <image iconName={iconName} cssClasses={[styles.icon]} />
+					)}
+				</box>
+
+				<box
+					orientation={Gtk.Orientation.VERTICAL}
+					hexpand
+					valign={Gtk.Align.CENTER}
+				>
+					<label label={label} halign={Gtk.Align.START} />
+					<WithOptional value={subLabel}>
+						{(subLabel) => (
+							<box>
+								{subLabel && (
+									<label label={subLabel} cssClasses={[styles.subLabel]} />
+								)}
+							</box>
+						)}
+					</WithOptional>
+				</box>
+				<WithOptional value={endLabel}>
+					{(endLabel) => (
+						<box>{endLabel && <label label={endLabel} cssClasses={[styles.endLabel]} />}</box>
+					)}
+				</WithOptional>
 			</box>
 		</button>
 	);
