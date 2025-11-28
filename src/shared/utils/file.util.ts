@@ -65,3 +65,58 @@ export async function makeDirectoryRecursive(file: Gio.File) {
 		throw e;
 	}
 }
+
+export async function scanDirectory(file: Gio.File) {
+	const type = await getFileType(file);
+	if (type != Gio.FileType.DIRECTORY) {
+		throw new Error("Path is not a directory");
+	}
+
+	return new Promise<Gio.FileInfo[]>((resolve, reject) => {
+		file.enumerate_children_async(
+			"standard::*",
+			null,
+			GLib.PRIORITY_DEFAULT_IDLE,
+			null,
+			async (_file, result) => {
+				try {
+					const enumerator = file.enumerate_children_finish(result);
+					const files: Gio.FileInfo[] = [];
+
+					const next = () =>
+						new Promise<Gio.FileInfo[]>((resolve, reject) => {
+							enumerator.next_files_async(
+								10,
+								GLib.PRIORITY_DEFAULT_IDLE,
+								null,
+								(_enumerator, result) => {
+									try {
+										resolve(enumerator.next_files_finish(result));
+									} catch (e) {
+										reject(e);
+									}
+								},
+							);
+						});
+
+					while (true) {
+						try {
+							const filesChunk = await next();
+							if (filesChunk.length) {
+								files.push(...filesChunk);
+							} else {
+								resolve(files);
+								break;
+							}
+						} catch (e) {
+							reject(e);
+							break;
+						}
+					}
+				} catch (e) {
+					reject(e);
+				}
+			},
+		);
+	});
+}

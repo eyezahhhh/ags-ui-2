@@ -19,6 +19,12 @@ import { BluetoothMenuHandler } from "main/menu/handlers/bluetooth/bluetooth.men
 import { TimeMenuHandler } from "main/menu/handlers/time/time.menu-handler";
 import { BatteryBarWidget } from "./widgets/battery/battery.bar-widget";
 import { PowerMenuHandler } from "main/menu/handlers/power/power.menu-handler";
+import AstalPowerProfiles from "gi://AstalPowerProfiles?version=0.1";
+import Hyprshade from "@service/hyprshade";
+import { BrightnessBarWidget } from "./widgets/brightness/brightness.bar-widget";
+import { DisplayMenuHandler } from "main/menu/handlers/display/display.menu-handler";
+
+Hyprshade.get_default();
 
 export function BarWindow(gdkMonitor: Gdk.Monitor) {
 	const { TOP, LEFT, RIGHT } = Astal.WindowAnchor;
@@ -27,6 +33,7 @@ export function BarWindow(gdkMonitor: Gdk.Monitor) {
 		// <label label="❤️" />,
 		<VolumeBarWidget onClicked={() => toggleMenu(AudioMenuHandler)} />,
 		// <BluetoothBarWidget onClicked={() => toggleMenu(BluetoothMenuHandler)} />,
+		<BrightnessBarWidget onClicked={() => toggleMenu(DisplayMenuHandler)} />,
 		<NetworkBarWidget onClicked={() => toggleMenu(NetworkMenuHandler)} />,
 		<BatteryBarWidget onClicked={() => toggleMenu(PowerMenuHandler)} />,
 		<ClockBarWidget onClicked={() => toggleMenu(TimeMenuHandler)} />,

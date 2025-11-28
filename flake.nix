@@ -43,6 +43,7 @@
             bluetooth
             auth
             greet
+            powerprofiles
           ];
 
           extraPackages = astalPackages ++ [
@@ -99,6 +100,7 @@
             bluetooth
             auth
             greet
+            powerprofiles
           ];
 
           extraPackages = astalPackages ++ [

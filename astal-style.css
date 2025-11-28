@@ -85,8 +85,13 @@
 }
 .battery-bar-widget-module__button___YGwUI {
   all: unset;
+  padding: 0 6px;
 }
 .bluetooth-bar-widget-module__button___ODGit {
+  all: unset;
+  padding: 0 6px;
+}
+.brightness-bar-widget-module__button___8f2l9 {
   all: unset;
   padding: 0 6px;
 }
@@ -121,11 +126,12 @@
   margin-right: 4px;
 }
 
-.network-menu-handler-module__wifiSectionButtons___79jQC {
-  margin-bottom: 8px;
-}
 .network-menu-handler-module__wifiSectionButtons___79jQC .network-menu-handler-module__wifiSectionButton___BMKjZ {
   margin-right: 8px;
+}
+
+.network-menu-handler-module__accessPoints___XLcUD {
+  margin-top: 8px;
 }
 .power-menu-handler-module__percentLabel___L13cc {
   font-size: 24px;

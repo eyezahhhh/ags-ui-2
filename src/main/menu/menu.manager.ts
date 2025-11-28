@@ -7,6 +7,7 @@ import { NetworkMenuHandler } from "./handlers/network/network.menu-handler";
 import { BluetoothMenuHandler } from "./handlers/bluetooth/bluetooth.menu-handler";
 import { TimeMenuHandler } from "./handlers/time/time.menu-handler";
 import { PowerMenuHandler } from "./handlers/power/power.menu-handler";
+import { DisplayMenuHandler } from "./handlers/display/display.menu-handler";
 
 const [activeHandler, setActiveHandler] = createState<IMenuHandlerState>({
 	handler: null,
@@ -65,5 +66,6 @@ export const MENU_HANDLERS: MenuHandler[] = [
 	new NetworkMenuHandler(),
 	new BluetoothMenuHandler(),
 	new TimeMenuHandler(),
-	new PowerMenuHandler()
+	new PowerMenuHandler(),
+	new DisplayMenuHandler(),
 ] as const;

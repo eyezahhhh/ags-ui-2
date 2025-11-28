@@ -12,7 +12,7 @@ interface Props {
 	iconName?: string | Accessor<string>;
 	active?: boolean | Accessor<boolean>;
 	onClicked?: () => void;
-	cursor?: Gdk.Cursor | Accessor<Gdk.Cursor>
+	cursor?: Gdk.Cursor | Accessor<Gdk.Cursor>;
 }
 
 export function ClickableListEntry({
@@ -22,7 +22,7 @@ export function ClickableListEntry({
 	iconName,
 	active,
 	onClicked,
-	cursor
+	cursor,
 }: Props) {
 	return (
 		<button
@@ -65,7 +65,11 @@ export function ClickableListEntry({
 				</box>
 				<WithOptional value={endLabel}>
 					{(endLabel) => (
-						<box>{endLabel && <label label={endLabel} cssClasses={[styles.endLabel]} />}</box>
+						<box>
+							{endLabel && (
+								<label label={endLabel} cssClasses={[styles.endLabel]} />
+							)}
+						</box>
 					)}
 				</WithOptional>
 			</box>

@@ -3,7 +3,14 @@ import { MenuHandler } from "../menu-handler";
 import AstalNetwork from "gi://AstalNetwork?version=0.1";
 import styles from "./network.menu-handler.style";
 import { Gtk } from "ags/gtk4";
-import { Accessor, createBinding, createState, For, With } from "gnim";
+import {
+	Accessor,
+	createBinding,
+	createComputed,
+	createState,
+	For,
+	With,
+} from "gnim";
 import { getRescanningWifiAccessor, rescanWifi } from "@util/network";
 import { createCommandProcess, doesCommandExist } from "@util/cli";
 import NM from "gi://NM?version=1.0";
@@ -150,7 +157,6 @@ export class NetworkMenuHandler extends MenuHandler {
 		data: string | number | null,
 	): GObject.Object {
 		const network = AstalNetwork.get_default();
-
 		if (typeof data == "string" && data.startsWith("qrcode_")) {
 			const ssid = data.substring("qrcode_".length);
 			const connection = network.client
@@ -253,37 +259,52 @@ export class NetworkMenuHandler extends MenuHandler {
 										<image iconName="network-wireless-symbolic" />
 									</ToggleButton>
 									<ToggleButton
-										disabled={getRescanningWifiAccessor()}
+										disabled={createComputed(
+											[
+												getRescanningWifiAccessor(),
+												createBinding(wifi, "enabled"),
+											],
+											(rescanning, enabled) => rescanning || !enabled,
+										)}
 										onClicked={() => rescanWifi().catch(() => {})}
 										cssClasses={[styles.wifiSectionButton]}
 									>
 										<image iconName="view-refresh-symbolic" />
 									</ToggleButton>
 								</box>
-								<For
-									each={
+								<With
+									value={
 										createBinding(wifi, "access_points").as((accessPoints) =>
 											accessPoints.sort((a, b) => b.strength - a.strength),
 										) as Accessor<AstalNetwork.AccessPoint[]>
 									}
 								>
-									{(accessPoint) => (
-										<AccessPoint
-											ap={accessPoint}
-											onClicked={openWifiNetwork.as(
-												(openAP) => () =>
-													setOpenWifiNetwork(
-														openAP == accessPoint.bssid
-															? null
-															: accessPoint.bssid,
-													),
-											)}
-											isOpen={openWifiNetwork.as(
-												(openAP) => openAP == accessPoint.bssid,
-											)}
-										/>
-									)}
-								</For>
+									{(accessPoints) =>
+										!!accessPoints.length && (
+											<box
+												orientation={Gtk.Orientation.VERTICAL}
+												cssClasses={[styles.accessPoints]}
+											>
+												{accessPoints.map((accessPoint) => (
+													<AccessPoint
+														ap={accessPoint}
+														onClicked={openWifiNetwork.as(
+															(openAP) => () =>
+																setOpenWifiNetwork(
+																	openAP == accessPoint.bssid
+																		? null
+																		: accessPoint.bssid,
+																),
+														)}
+														isOpen={openWifiNetwork.as(
+															(openAP) => openAP == accessPoint.bssid,
+														)}
+													/>
+												))}
+											</box>
+										)
+									}
+								</With>
 							</box>
 						) : (
 							<box>

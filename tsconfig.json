@@ -1,37 +1,22 @@
 {
-  "$schema": "https://json.schemastore.org/tsconfig",
-  "compilerOptions": {
-    "baseUrl": "./src",
-    "jsx": "react-jsx",
-    "jsxImportSource": "ags/gtk4",
-    "lib": [
-      "ES2023",
-      "DOM"
-    ],
-    "module": "ES2022",
-    "moduleResolution": "Bundler",
-    "paths": {
-      "@components/*": [
-        "shared/components/*.component"
-      ],
-      "@icon/*": [
-        "shared/icons/*.icon"
-      ],
-      "@interface/*": [
-        "shared/interfaces/*.interface"
-      ],
-      "@styles/*": [
-        "shared/styles/*.global.style"
-      ],
-      "@util/*": [
-        "shared/utils/*.util"
-      ]
-    },
-    "strict": true,
-    "target": "ES2020"
-  },
-  "include": [
-    "src/**/*",
-    "@girs/**/*"
-  ]
+	"$schema": "https://json.schemastore.org/tsconfig",
+	"compilerOptions": {
+		"baseUrl": "./src",
+		"jsx": "react-jsx",
+		"jsxImportSource": "ags/gtk4",
+		"lib": ["ES2023", "DOM"],
+		"module": "ES2022",
+		"moduleResolution": "Bundler",
+		"paths": {
+			"@components/*": ["shared/components/*.component"],
+			"@icon/*": ["shared/icons/*.icon"],
+			"@interface/*": ["shared/interfaces/*.interface"],
+			"@styles/*": ["shared/styles/*.global.style"],
+			"@util/*": ["shared/utils/*.util"],
+			"@service/*": ["shared/services/*.service"]
+		},
+		"strict": true,
+		"target": "ES2020"
+	},
+	"include": ["src/**/*", "@girs/**/*"]
 }

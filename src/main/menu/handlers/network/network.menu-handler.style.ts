@@ -3,6 +3,7 @@ const styles = {
     "passwordTextContainer": "network-menu-handler-module__passwordTextContainer___T4ykO",
     "passwordLockIcon": "network-menu-handler-module__passwordLockIcon___iGoIi",
     "wifiSectionButtons": "network-menu-handler-module__wifiSectionButtons___79jQC",
-    "wifiSectionButton": "network-menu-handler-module__wifiSectionButton___BMKjZ"
+    "wifiSectionButton": "network-menu-handler-module__wifiSectionButton___BMKjZ",
+    "accessPoints": "network-menu-handler-module__accessPoints___XLcUD"
 };
 export default styles;
