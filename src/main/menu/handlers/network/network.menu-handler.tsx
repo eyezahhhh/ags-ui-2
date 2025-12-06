@@ -9,6 +9,7 @@ import {
 	createComputed,
 	createState,
 	For,
+	onCleanup,
 	With,
 } from "gnim";
 import { getRescanningWifiAccessor, rescanWifi } from "@util/network";
@@ -22,6 +23,10 @@ import Gio from "gi://Gio?version=2.0";
 import Thumbnail from "@components/thumbnail/thumbnail";
 import { AccessPoint } from "@components/access-point/access-point";
 import { ToggleButton } from "@components/toggle-button/toggle-button";
+import WireGuard from "@service/wireguard";
+import { WireguardConnection } from "@components/wireguard-connection/wireguard-connection";
+import { Expandable } from "@components/expandable/expandable";
+import { Destroyer } from "@util/destroyer";
 
 export class NetworkMenuHandler extends MenuHandler {
 	private qrCodeSupported = false;
@@ -232,87 +237,243 @@ export class NetworkMenuHandler extends MenuHandler {
 			}
 		}
 
+		const destroyer = new Destroyer();
+		onCleanup(() => destroyer.destroy());
+
+		const wireguard = WireGuard.get_default();
 		const [openWifiNetwork, setOpenWifiNetwork] = createState<string | null>(
 			null,
 		);
 
+		const [activeWg, setActiveWg] = createState<WireGuard.Connection[]>([]);
+		const [inactiveWg, setInactiveWg] = createState<WireGuard.Connection[]>([]);
+		let activeWgDestroyer: Destroyer | null = null;
+		destroyer.add(() => activeWgDestroyer?.destroy());
+
+		const updateActiveWg = () => {
+			activeWgDestroyer?.destroy();
+
+			const scan = () => {
+				const newActiveList = wireguard.connections.filter(
+					(connection) => connection.status != WireGuard.Status.DISABLED,
+				);
+				const newInactiveList = wireguard.connections.filter(
+					(connection) => connection.status == WireGuard.Status.DISABLED,
+				);
+				const currentActiveList = activeWg.get();
+				const currentInactiveList = inactiveWg.get();
+				let updateActive = newActiveList.length != currentActiveList.length;
+				if (!updateActive) {
+					for (let entry of newActiveList) {
+						if (!currentActiveList.includes(entry)) {
+							updateActive = true;
+							break;
+						}
+					}
+					if (!updateActive) {
+						for (let entry of currentActiveList) {
+							if (!newActiveList.includes(entry)) {
+								updateActive = true;
+								break;
+							}
+						}
+					}
+				}
+				let updateInactiveWg =
+					newInactiveList.length != currentInactiveList.length;
+				if (!updateInactiveWg) {
+					for (let entry of newInactiveList) {
+						if (!currentInactiveList.includes(entry)) {
+							updateInactiveWg = true;
+							break;
+						}
+					}
+					if (!updateInactiveWg) {
+						for (let entry of currentInactiveList) {
+							if (!newInactiveList.includes(entry)) {
+								updateInactiveWg = true;
+								break;
+							}
+						}
+					}
+				}
+
+				if (updateActive) {
+					setActiveWg(newActiveList);
+				}
+				if (updateInactiveWg) {
+					setInactiveWg(newInactiveList);
+				}
+			};
+
+			const destroyer = new Destroyer();
+			activeWgDestroyer = destroyer;
+
+			for (const connection of wireguard.connections) {
+				destroyer.addDisconnect(
+					connection,
+					connection.connect("notify::status", scan),
+				);
+			}
+
+			scan();
+		};
+
+		destroyer.addDisconnect(
+			wireguard,
+			wireguard.connect("notify::connections", () => updateActiveWg()),
+		);
+		updateActiveWg();
+
 		return (
 			<box orientation={Gtk.Orientation.VERTICAL} widthRequest={250}>
-				<With
-					value={
-						createBinding(network, "wifi") as Accessor<AstalNetwork.Wifi | null>
-					}
-				>
-					{(wifi) =>
-						wifi ? (
-							<box orientation={Gtk.Orientation.VERTICAL}>
-								<box cssClasses={[styles.wifiSectionButtons]}>
-									<ToggleButton
-										disabled={createBinding(wifi, "enabled").as(
-											(enabled) => !enabled,
-										)}
-										onClicked={() =>
-											network.wifi.set_enabled(!network.wifi.enabled)
-										}
-										cssClasses={[styles.wifiSectionButton]}
-									>
-										<image iconName="network-wireless-symbolic" />
-									</ToggleButton>
-									<ToggleButton
-										disabled={createComputed(
-											[
-												getRescanningWifiAccessor(),
-												createBinding(wifi, "enabled"),
-											],
-											(rescanning, enabled) => rescanning || !enabled,
-										)}
-										onClicked={() => rescanWifi().catch(() => {})}
-										cssClasses={[styles.wifiSectionButton]}
-									>
-										<image iconName="view-refresh-symbolic" />
-									</ToggleButton>
-								</box>
-								<With
-									value={
-										createBinding(wifi, "access_points").as((accessPoints) =>
-											accessPoints.sort((a, b) => b.strength - a.strength),
-										) as Accessor<AstalNetwork.AccessPoint[]>
-									}
+				<box>
+					<With
+						value={
+							createBinding(wireguard, "connections").as(
+								(connections) => !!connections.length,
+							) as Accessor<boolean>
+						}
+					>
+						{(show) =>
+							show && (
+								<box
+									cssClasses={[styles.wireguardSection]}
+									orientation={Gtk.Orientation.VERTICAL}
 								>
-									{(accessPoints) =>
-										!!accessPoints.length && (
-											<box
-												orientation={Gtk.Orientation.VERTICAL}
-												cssClasses={[styles.accessPoints]}
-											>
-												{accessPoints.map((accessPoint) => (
-													<AccessPoint
-														ap={accessPoint}
-														onClicked={openWifiNetwork.as(
-															(openAP) => () =>
-																setOpenWifiNetwork(
-																	openAP == accessPoint.bssid
-																		? null
-																		: accessPoint.bssid,
-																),
-														)}
-														isOpen={openWifiNetwork.as(
-															(openAP) => openAP == accessPoint.bssid,
-														)}
-													/>
-												))}
-											</box>
-										)
-									}
-								</With>
-							</box>
-						) : (
-							<box>
-								<label label="WiFi is not enabled" />
-							</box>
-						)
-					}
-				</With>
+									<box>
+										<With value={activeWg}>
+											{(list) =>
+												list.length ? (
+													<box orientation={Gtk.Orientation.VERTICAL}>
+														{list.map((connection) => (
+															<box cssClasses={[styles.wireguardConnection]}>
+																<WireguardConnection connection={connection} />
+															</box>
+														))}
+													</box>
+												) : (
+													<box>
+														<label
+															label="No active WG connections"
+															justify={Gtk.Justification.CENTER}
+															hexpand
+															cssClasses={[styles.noneActive]}
+														/>
+													</box>
+												)
+											}
+										</With>
+									</box>
+									<box>
+										<With
+											value={inactiveWg.as((inactiveWg) => !inactiveWg.length)}
+										>
+											{(hide) =>
+												hide ? (
+													<box />
+												) : (
+													<Expandable>
+														<For each={inactiveWg}>
+															{(connection) => (
+																<box cssClasses={[styles.wireguardConnection]}>
+																	<WireguardConnection
+																		connection={connection}
+																	/>
+																</box>
+															)}
+														</For>
+													</Expandable>
+												)
+											}
+										</With>
+									</box>
+								</box>
+							)
+						}
+					</With>
+				</box>
+
+				<box>
+					<With
+						value={
+							createBinding(
+								network,
+								"wifi",
+							) as Accessor<AstalNetwork.Wifi | null>
+						}
+					>
+						{(wifi) =>
+							wifi ? (
+								<box orientation={Gtk.Orientation.VERTICAL}>
+									<box cssClasses={[styles.wifiSectionButtons]}>
+										<ToggleButton
+											disabled={createBinding(wifi, "enabled").as(
+												(enabled) => !enabled,
+											)}
+											onClicked={() =>
+												network.wifi.set_enabled(!network.wifi.enabled)
+											}
+											cssClasses={[styles.wifiSectionButton]}
+										>
+											<image iconName="network-wireless-symbolic" />
+										</ToggleButton>
+										<ToggleButton
+											disabled={createComputed(
+												[
+													getRescanningWifiAccessor(),
+													createBinding(wifi, "enabled"),
+												],
+												(rescanning, enabled) => rescanning || !enabled,
+											)}
+											onClicked={() => rescanWifi().catch(() => {})}
+											cssClasses={[styles.wifiSectionButton]}
+										>
+											<image iconName="view-refresh-symbolic" />
+										</ToggleButton>
+									</box>
+									<With
+										value={
+											createBinding(wifi, "access_points").as((accessPoints) =>
+												accessPoints.sort((a, b) => b.strength - a.strength),
+											) as Accessor<AstalNetwork.AccessPoint[]>
+										}
+									>
+										{(accessPoints) =>
+											!!accessPoints.length && (
+												<box
+													orientation={Gtk.Orientation.VERTICAL}
+													cssClasses={[styles.accessPoints]}
+												>
+													{accessPoints.map((accessPoint) => (
+														<AccessPoint
+															ap={accessPoint}
+															onClicked={openWifiNetwork.as(
+																(openAP) => () =>
+																	setOpenWifiNetwork(
+																		openAP == accessPoint.bssid
+																			? null
+																			: accessPoint.bssid,
+																	),
+															)}
+															isOpen={openWifiNetwork.as(
+																(openAP) => openAP == accessPoint.bssid,
+															)}
+														/>
+													))}
+												</box>
+											)
+										}
+									</With>
+								</box>
+							) : (
+								<box>
+									<label label="WiFi is not enabled" />
+								</box>
+							)
+						}
+					</With>
+				</box>
 			</box>
 		);
 	}

@@ -1,22 +1,29 @@
-import GObject, { property, register } from "gnim/gobject";
+import GObject, { getter, register, setter } from "gnim/gobject";
 import "ags/file";
 import { execAsync } from "ags/process";
 import { compareString } from "@util/string";
 import { doesCommandExist } from "@util/cli";
+import { KillablePromise } from "@interface/killable-promise";
 import { timeout } from "ags/time";
 
 namespace Hyprshade {
 	@register()
 	export class Shader extends GObject.Object {
-		private onChange: (self: Shader, active: boolean) => void;
+		private readonly _id: string;
+		private _active: boolean;
 
-		@property(String)
-		readonly id: string;
+		@getter(String)
+		get id() {
+			return this._id;
+		}
 
-		@property(Boolean)
-		active: boolean;
+		@getter(Boolean)
+		get active() {
+			return this._active;
+		}
 
-		set_active(active: boolean) {
+		@setter(Boolean)
+		set active(active: boolean) {
 			this.onChange(this, active);
 		}
 
@@ -27,15 +34,14 @@ namespace Hyprshade {
 				self: Shader,
 				callback: (active: boolean) => void,
 			) => void,
-			onChange: (self: Shader, active: boolean) => void,
+			private readonly onChange: (self: Shader, active: boolean) => void,
 		) {
 			super();
-			this.id = id;
-			this.active = active;
-			this.onChange = onChange;
+			this._id = id;
+			this._active = active;
 
 			createActiveListener(this, (active) => {
-				this.active = active;
+				this._active = active;
 				this.notify("active");
 			});
 		}
@@ -43,7 +49,11 @@ namespace Hyprshade {
 
 	@register()
 	class HyprshadeService extends GObject.Object {
-		private activeCallbacks = new Map<Shader, (active: boolean) => void>();
+		private readonly _shaders = new Map<
+			string,
+			{ shader: Shader; callback: (active: boolean) => void }
+		>();
+		private scanLoop: KillablePromise<void> | null = null;
 
 		constructor() {
 			super();
@@ -54,19 +64,39 @@ namespace Hyprshade {
 					return;
 				}
 				console.log("Hyprshade support is enabled.");
-				while (true) {
-					try {
-						await this.scan();
-					} catch (e) {
-						console.error(e);
-					}
-					await new Promise<void>((r) => timeout(3_000, r));
-				}
+
+				this.startScanLoop();
 			});
 		}
 
-		public async scan() {
+		private async startScanLoop() {
+			this.scanLoop?.kill();
+
+			let isKilled = false;
+			this.scanLoop = {
+				...new Promise<void>(async (resolve) => {
+					while (!isKilled) {
+						try {
+							await this._scan(() => isKilled);
+							await new Promise<void>((r) => timeout(3_000, r));
+						} catch (e) {
+							console.error(e);
+						}
+					}
+					resolve();
+				}),
+				kill: () => {
+					isKilled = true;
+				},
+			};
+		}
+
+		private async _scan(isKilled: () => boolean) {
 			const listOutput = await execAsync(["hyprshade", "ls"]);
+			if (isKilled()) {
+				return;
+			}
+
 			const shaderIds = listOutput.split("\n").map((file) => {
 				const active = file.startsWith("* ");
 				if (active || file.startsWith("  ")) {
@@ -79,63 +109,64 @@ namespace Hyprshade {
 			});
 			let updated = false;
 
-			const shaders = new Map<string, Shader>();
-			for (const shader of this.shaders) {
-				shaders.set(shader.id, shader);
-			}
-
-			for (const [shaderId, shader] of shaders.entries()) {
+			for (const [shaderId, { shader, callback }] of this._shaders.entries()) {
 				const entry = shaderIds.find((shader) => shader.id == shaderId);
 
 				if (entry) {
 					shaderIds.splice(shaderIds.indexOf(entry), 1);
 					if (entry.active != shader.active) {
-						this.activeCallbacks.get(shader)?.(entry.active);
+						callback(entry.active);
 					}
 				} else {
-					shaders.delete(shaderId);
+					this._shaders.delete(shaderId);
 					updated = true;
 				}
 			}
 
 			for (const { id, active } of shaderIds) {
-				shaders.set(
+				new Shader(
 					id,
-					new Shader(
-						id,
-						active,
-						(self, callback) => this.activeCallbacks.set(self, callback),
-						(self, active) => {
-							for (const shader of this.shaders) {
-								if (self == shader) {
-									if (shader.active != active) {
-										this.activeCallbacks.get(self)?.(active);
-									}
-								} else if (shader.active) {
-									this.activeCallbacks.get(shader)?.(false);
+					active,
+					(shader, callback) => {
+						this._shaders.set(id, {
+							shader,
+							callback,
+						});
+					},
+					(self, active) => {
+						this.scanLoop?.kill();
+						for (const { shader, callback } of this._shaders.values()) {
+							if (self == shader) {
+								if (shader.active != active) {
+									callback?.(active);
 								}
+							} else if (shader.active) {
+								callback(false);
 							}
-							if (active) {
-								execAsync(["hyprshade", "on", self.id]).catch(console.error);
-							} else {
-								execAsync(["hyprshade", "off"]).catch(console.error);
-							}
-						},
-					),
+						}
+						if (active) {
+							execAsync(["hyprshade", "on", self.id]).catch(console.error);
+						} else {
+							execAsync(["hyprshade", "off"]).catch(console.error);
+						}
+						this.startScanLoop();
+					},
 				);
+
 				updated = true;
 			}
 
 			if (updated) {
-				this.shaders = Array.from(shaders.values()).sort((a, b) =>
-					compareString(a.id, b.id),
-				);
 				this.notify("shaders");
 			}
 		}
 
-		@property(Object)
-		shaders: Shader[] = [];
+		@getter(Object)
+		get shaders() {
+			return Array.from(this._shaders.values())
+				.map((obj) => obj.shader)
+				.sort((a, b) => compareString(a.id, b.id));
+		}
 	}
 
 	let instance: HyprshadeService | null = null;

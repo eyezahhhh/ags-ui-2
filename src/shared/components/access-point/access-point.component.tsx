@@ -18,7 +18,6 @@ import styles from "./access-point.component.style";
 import { setMenu } from "main/menu/menu.manager";
 import { NetworkMenuHandler } from "main/menu/handlers/network/network.menu-handler";
 import { ToggleButton } from "@components/toggle-button/toggle-button";
-import { cc } from "@util/string";
 
 interface Props {
 	ap: AstalNetwork.AccessPoint | Accessor<AstalNetwork.AccessPoint>;
@@ -47,11 +46,11 @@ export function AccessPoint({ ap, onClicked, isOpen }: Props) {
 		connectToWifi(
 			getOptional(ap),
 			password ||
-			(() => {
-				if (getOptional(isOpen)) {
-					setShowWifiPasswordEntry(true);
-				}
-			}),
+				(() => {
+					if (getOptional(isOpen)) {
+						setShowWifiPasswordEntry(true);
+					}
+				}),
 		).catch((e) => {
 			console.error(e);
 		});
@@ -63,7 +62,9 @@ export function AccessPoint({ ap, onClicked, isOpen }: Props) {
 				<box orientation={Gtk.Orientation.VERTICAL}>
 					<ClickableListEntry
 						cursor={createCursorPointer()}
-						active={createBinding(network.wifi, "active_access_point").as((activeAP) => activeAP == ap)}
+						active={createBinding(network.wifi, "active_access_point").as(
+							(activeAP) => activeAP == ap,
+						)}
 						label={createComputed(
 							[createBinding(ap, "ssid"), createBinding(ap, "bssid")],
 							(ssid, bssid) => ssid || bssid,
@@ -115,7 +116,7 @@ export function AccessPoint({ ap, onClicked, isOpen }: Props) {
 								}>
 							}
 						>
-							{({ isActive, showPasswordEntry, remoteConnection }) =>
+							{({ isActive, showPasswordEntry, remoteConnection }) => (
 								<box cssClasses={[styles.revealerInner]}>
 									{showPasswordEntry ? (
 										<box>
@@ -154,22 +155,29 @@ export function AccessPoint({ ap, onClicked, isOpen }: Props) {
 											</button>
 											{remoteConnection && (
 												<>
-													<ToggleButton onClicked={() => setMenu(NetworkMenuHandler, `qrcode_${ap.ssid}`)} cssClasses={[styles.extraButton]}>
+													<ToggleButton
+														onClicked={() =>
+															setMenu(NetworkMenuHandler, `qrcode_${ap.ssid}`)
+														}
+														cssClasses={[styles.extraButton]}
+													>
 														<image iconName="emblem-shared-symbolic" />
 													</ToggleButton>
-													<ToggleButton onClicked={() => {
-														remoteConnection.delete_async(
-															null,
-															(_connection, result) => {
-																try {
-																	remoteConnection.delete_finish(result);
-																} catch (e) {
-																	console.error(e);
-																}
-															},
-														);
-													}}
-														cssClasses={[styles.extraButton]}>
+													<ToggleButton
+														onClicked={() => {
+															remoteConnection.delete_async(
+																null,
+																(_connection, result) => {
+																	try {
+																		remoteConnection.delete_finish(result);
+																	} catch (e) {
+																		console.error(e);
+																	}
+																},
+															);
+														}}
+														cssClasses={[styles.extraButton]}
+													>
 														<image iconName="edit-delete-symbolic" />
 													</ToggleButton>
 												</>
@@ -177,7 +185,7 @@ export function AccessPoint({ ap, onClicked, isOpen }: Props) {
 										</box>
 									)}
 								</box>
-							}
+							)}
 						</With>
 					</revealer>
 				</box>

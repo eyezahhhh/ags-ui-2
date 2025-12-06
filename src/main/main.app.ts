@@ -4,6 +4,7 @@ import { createDebouncer } from "@util/time";
 import { BarWindow } from "./bar/bar.window";
 import { MenuWindow } from "./menu/menu.window";
 import { CLASS } from "constants/class.const";
+import WireGuard from "@service/wireguard";
 
 const reloadStyles = createDebouncer(() => {
 	app.reset_css();
@@ -23,5 +24,7 @@ app.start({
 		MenuWindow();
 
 		monitorFile("./astal-style.css", () => reloadStyles());
+
+		WireGuard.get_default(); // load WireGuard before it's visually needed
 	},
 });

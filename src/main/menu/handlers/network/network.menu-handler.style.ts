@@ -1,4 +1,7 @@
 const styles = {
+    "wireguardSection": "network-menu-handler-module__wireguardSection___qrBNp",
+    "noneActive": "network-menu-handler-module__noneActive___gT-y9",
+    "wireguardConnection": "network-menu-handler-module__wireguardConnection___GtKKO",
     "passwordRevealContainer": "network-menu-handler-module__passwordRevealContainer___z-k80",
     "passwordTextContainer": "network-menu-handler-module__passwordTextContainer___T4ykO",
     "passwordLockIcon": "network-menu-handler-module__passwordLockIcon___iGoIi",

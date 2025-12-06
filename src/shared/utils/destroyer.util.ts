@@ -16,10 +16,16 @@ export class Destroyer {
 		}
 
 		this.callbacks.add(callback);
+		return () => this.remove(callback);
 	}
 
 	addDisconnect(object: Disconnectable, connectionId: number) {
-		this.add(() => object.disconnect(connectionId));
+		const callback = () => object.disconnect(connectionId);
+		return this.add(callback);
+	}
+
+	remove(callback: () => void) {
+		this.callbacks.delete(callback);
 	}
 
 	destroy() {

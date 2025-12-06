@@ -74,6 +74,9 @@
 .clickable-list-entry-module__button___5GuG3 .clickable-list-entry-module__endLabel___yd5iu {
   margin-left: 24px;
 }
+.expandable-component-module__button___RbjME {
+  padding: 0;
+}
 .toggle-button-component-module__active___QxdH1 {
   outline-color: rgba(255, 0, 0, 0.7);
   outline-width: 2px;
@@ -82,6 +85,9 @@
 .toggle-button-component-module__disabled___F5Uq0 {
   background: rgba(82, 82, 82, 0.5);
   color: #515151;
+}
+.wireguard-connection-component-module__button___F851L {
+  margin-right: 4px;
 }
 .battery-bar-widget-module__button___YGwUI {
   all: unset;
@@ -116,6 +122,16 @@
 .audio-menu-handler-module__topContainer___N0-il {
   min-height: 24px;
   margin-bottom: 8px;
+}
+
+.network-menu-handler-module__wireguardSection___qrBNp {
+  margin-bottom: 8px;
+}
+.network-menu-handler-module__wireguardSection___qrBNp .network-menu-handler-module__noneActive___gT-y9 {
+  margin-bottom: 8px;
+}
+.network-menu-handler-module__wireguardSection___qrBNp .network-menu-handler-module__wireguardConnection___GtKKO {
+  margin-bottom: 4px;
 }
 
 .network-menu-handler-module__passwordRevealContainer___z-k80 .network-menu-handler-module__passwordTextContainer___T4ykO {

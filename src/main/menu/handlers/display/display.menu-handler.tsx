@@ -32,7 +32,7 @@ export class DisplayMenuHandler extends MenuHandler {
 								subLabel={createBinding(shader, "active").as((active) =>
 									active ? "Active" : null,
 								)}
-								onClicked={() => shader.set_active(!shader.active)}
+								onClicked={() => (shader.active = !shader.active)}
 							/>
 							// <box>
 							// 	<label label={createBinding(shader, "id")} />
