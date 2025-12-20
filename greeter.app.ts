@@ -1,5 +1,6 @@
 import { CLASS } from "@const/class";
 import { createDebouncer } from "@util/time";
+import { monitorFile } from "ags/file";
 import app from "ags/gtk4/app";
 import { GreeterWindow } from "greeter/greeter.window";
 
@@ -17,5 +18,7 @@ app.start({
 		for (const monitor of monitors) {
 			GreeterWindow(monitor);
 		}
+
+		monitorFile("./astal-style.css", () => reloadStyles());
 	},
 });

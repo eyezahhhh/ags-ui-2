@@ -2,7 +2,7 @@ import { CLASS } from "@const/class";
 import { Astal, Gdk } from "ags/gtk4";
 import styles from "./greeter.window.style";
 import app from "ags/gtk4/app";
-import { createState, onCleanup } from "gnim";
+import { Accessor, createBinding, createState, For, onCleanup } from "gnim";
 import Gamepad from "@service/gamepad";
 import { Destroyer } from "@util/destroyer";
 
@@ -29,6 +29,17 @@ export function GreeterWindow(gdkMonitor: Gdk.Monitor) {
 		>
 			<box>
 				<label label="Greeter!" />
+				<For
+					each={
+						createBinding(gamepad, "gamepads") as Accessor<Gamepad.Gamepad[]>
+					}
+				>
+					{(gamepad) => (
+						<box>
+							<label label={createBinding(gamepad, "direction")} />
+						</box>
+					)}
+				</For>
 			</box>
 		</window>
 	);
