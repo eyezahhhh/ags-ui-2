@@ -53,6 +53,7 @@ export function WireguardConnection({ connection }: Props) {
 									],
 									(name, alias) => alias || name,
 								)}
+								cssClasses={[styles.label]}
 							/>
 							<label
 								hexpand
@@ -69,6 +70,7 @@ export function WireguardConnection({ connection }: Props) {
 										return status;
 									},
 								)}
+								cssClasses={[styles.subLabel]}
 							/>
 						</box>
 					</box>

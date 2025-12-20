@@ -1,6 +1,7 @@
 {
 	"scripts": {
-		"dev": "concurrently --kill-others-on-fail 'node styles.js' 'nodemon -e ts,tsx -i \"**/*.style.ts\" -x \"ags run -d . --gtk 4\"'",
+		"dev:greeter": "concurrently --kill-others-on-fail 'node styles.js' 'nodemon -e ts,tsx -i \"**/*.style.ts\" -x \"ags run -d . --gtk 4 greeter.app.ts\"'",
+		"dev:main": "concurrently --kill-others-on-fail 'node styles.js' 'nodemon -e ts,tsx -i \"**/*.style.ts\" -x \"ags run -d . --gtk 4 main.app.ts\"'",
 		"format:check": "prettier -c src",
 		"format:write": "prettier -w src",
 		"generate-types": "npm ci && ags types -d . -u"

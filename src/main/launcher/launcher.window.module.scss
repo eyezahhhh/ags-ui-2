@@ -1,0 +1,24 @@
+@use "../../theme";
+
+.window {
+	background: transparent;
+}
+
+.container {
+	color: theme.$text;
+	background: theme.$background-transparent;
+	transition: background-color 0.5s;
+	border-radius: 10px;
+
+	.entry {
+		font-size: 2rem;
+		background: transparent;
+		padding: 0;
+		border: none;
+		outline: none;
+
+		selection {
+			background: rgba(theme.$wallust-color1, 0.5);
+		}
+	}
+}

@@ -49,7 +49,7 @@ export class PowerMenuHandler extends MenuHandler {
 											(energy) => `${energy}W`,
 										)}
 									/>
-									<label
+									{/* <label
 										halign={Gtk.Align.START}
 										label={createComputed(
 											[
@@ -62,7 +62,7 @@ export class PowerMenuHandler extends MenuHandler {
 													? `Charged in ${formatTime(timeToFull)}`
 													: `Empty in ${formatTime(timeToEmpty)}`,
 										)}
-									/>
+									/> */}
 								</box>
 							</box>
 						)

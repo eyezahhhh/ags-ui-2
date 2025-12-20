@@ -11,12 +11,13 @@
 			"@components/*": ["shared/components/*.component"],
 			"@icon/*": ["shared/icons/*.icon"],
 			"@interface/*": ["shared/interfaces/*.interface"],
+			"@service/*": ["shared/services/*.service"],
 			"@styles/*": ["shared/styles/*.global.style"],
 			"@util/*": ["shared/utils/*.util"],
-			"@service/*": ["shared/services/*.service"]
+			"@const/*": ["constants/*.const"]
 		},
 		"strict": true,
 		"target": "ES2020"
 	},
-	"include": ["src/**/*", "@girs/**/*"]
+	"include": ["src/**/*", "@girs/**/*", "main.app.ts", "greeter.app.ts"]
 }

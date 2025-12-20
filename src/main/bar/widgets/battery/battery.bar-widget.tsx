@@ -3,6 +3,7 @@ import styles from "./battery.bar-widget.style";
 import { createBinding, createComputed } from "gnim";
 import { createCursorPointer } from "@util/ags";
 import AstalPowerProfiles from "gi://AstalPowerProfiles?version=0.1";
+import { Gtk } from "ags/gtk4";
 
 interface Props {
 	onClicked?: () => void;
@@ -24,19 +25,34 @@ export function BatteryBarWidget({ onClicked }: Props) {
 			onClicked={onClicked}
 			cursor={createCursorPointer()}
 		>
-			{/* <image iconName={createBinding(battery, "battery_icon_name")} /> */}
-			<image
-				iconName={createComputed(
-					[
-						createBinding(battery, "device_type"),
-						createBinding(battery, "battery_icon_name"),
-					],
-					(type, icon) =>
-						type == AstalBattery.Type.UNKNOWN
-							? "gnome-power-manager-symbolic"
-							: icon,
-				)}
-			/>
+			<box>
+				<image
+					iconName={createComputed(
+						[
+							createBinding(battery, "device_type"),
+							createBinding(battery, "battery_icon_name"),
+						],
+						(type, icon) =>
+							type == AstalBattery.Type.UNKNOWN
+								? "gnome-power-manager-symbolic"
+								: icon,
+					)}
+				/>
+				<revealer
+					transitionType={Gtk.RevealerTransitionType.SLIDE_RIGHT}
+					transitionDuration={250}
+					revealChild={createBinding(battery, "percentage").as(
+						(percent) => percent <= 0.2,
+					)}
+				>
+					<label
+						cssClasses={[styles.label]}
+						label={createBinding(battery, "percentage").as(
+							(percent) => `${percent * 100}%`,
+						)}
+					/>
+				</revealer>
+			</box>
 		</button>
 	);
 }

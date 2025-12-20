@@ -1,10 +1,12 @@
 import app from "ags/gtk4/app";
 import { monitorFile } from "ags/file";
 import { createDebouncer } from "@util/time";
-import { BarWindow } from "./bar/bar.window";
-import { MenuWindow } from "./menu/menu.window";
-import { CLASS } from "constants/class.const";
+import { BarWindow } from "./src/main/bar/bar.window";
+import { MenuWindow } from "./src/main/menu/menu.window";
 import WireGuard from "@service/wireguard";
+import { LauncherWindow } from "./src/main/launcher/launcher.window";
+import Gamepad from "@service/gamepad";
+import { CLASS } from "@const/class";
 
 const reloadStyles = createDebouncer(() => {
 	app.reset_css();
@@ -22,9 +24,12 @@ app.start({
 			BarWindow(monitor);
 		}
 		MenuWindow();
+		// LauncherWindow();
 
 		monitorFile("./astal-style.css", () => reloadStyles());
 
 		WireGuard.get_default(); // load WireGuard before it's visually needed
 	},
 });
+
+Gamepad.get_default();

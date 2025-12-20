@@ -7,6 +7,7 @@ import styles from "./audio.menu-handler.style";
 import { getValidIcon } from "@util/icon";
 import sliderStyles from "@styles/slider";
 import { ClickableListEntry } from "@components/clickable-list-entry/clickable-list-entry";
+import { createCursorPointer } from "@util/ags";
 
 export class AudioMenuHandler extends MenuHandler {
 	constructor() {
@@ -61,6 +62,7 @@ export class AudioMenuHandler extends MenuHandler {
 								}
 								active={createBinding(wpEndpoint, "is_default")}
 								onClicked={() => (wpEndpoint.isDefault = true)}
+								cursor={createCursorPointer()}
 							/>
 						)}
 					</For>

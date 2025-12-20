@@ -1,6 +1,8 @@
 import Hyprshade from "@service/hyprshade";
 import styles from "./brightness.bar-widget.style";
-import { createBinding, createComputed, With } from "gnim";
+import { Accessor, createBinding, createComputed, With } from "gnim";
+import { createCursorPointer } from "@util/ags";
+import Brightness from "@service/brightness";
 
 interface Props {
 	onClicked?: () => void;
@@ -8,21 +10,43 @@ interface Props {
 
 export function BrightnessBarWidget({ onClicked }: Props) {
 	const hyprshade = Hyprshade.get_default();
+	const brightness = Brightness.get_default();
 
 	const enabledBinding = createComputed(
-		[createBinding(hyprshade, "shaders")],
-		(shaders) => !!shaders.length,
+		[createBinding(hyprshade, "shaders"), createBinding(brightness, "primary")],
+		(shaders, brightnessDevice) => !!shaders.length || !!brightnessDevice,
 	);
 
 	return (
 		<With value={enabledBinding}>
 			{(enabled) =>
-				enabled ? (
-					<button cssClasses={[styles.button]} onClicked={onClicked}>
-						<image iconName="display-brightness-symbolic" />
-					</button>
-				) : (
-					<box />
+				enabled && (
+					<box>
+						<With
+							value={
+								createBinding(
+									brightness,
+									"primary",
+								) as Accessor<Brightness.Device | null>
+							}
+						>
+							{(device) => (
+								<button
+									cssClasses={[styles.button]}
+									onClicked={onClicked}
+									cursor={createCursorPointer()}
+								>
+									<image
+										iconName={
+											device
+												? createBinding(device, "icon")
+												: "display-brightness-symbolic"
+										}
+									/>
+								</button>
+							)}
+						</With>
+					</box>
 				)
 			}
 		</With>
