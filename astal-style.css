@@ -2,6 +2,20 @@
 .greeter-window-module__window___4TCTc {
   background: transparent;
 }
+
+.greeter-window-module__container___9IIeb {
+  background: red;
+}
+.gamepad-password-input-module__container___KWkxt {
+  background: blue;
+  border-radius: 3px;
+  margin: 10px;
+  min-width: 100px;
+  min-height: 20px;
+}
+.gamepad-password-input-module__container___KWkxt.gamepad-password-input-module__focused___H-MNX {
+  background: green;
+}
 .bar-window-module__window___PBwlQ {
   background: transparent;
   font-family: "Inter";

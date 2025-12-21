@@ -158,24 +158,17 @@ namespace Gamepad {
 					[14]: GamepadDirection.LEFT,
 					[15]: GamepadDirection.RIGHT,
 				};
-				console.log(DIRECTION_KEYS);
 				const directionKeyIndexes = Object.keys(DIRECTION_KEYS)
 					.map((key) => parseInt(key))
 					.sort();
 
 				if (buttons[directionKeyIndexes[directionKeyIndexes.length - 1]]) {
-					console.log("Gamepad has enough buttons to track D-pad");
-
 					for (let index of directionKeyIndexes) {
 						const direction = DIRECTION_KEYS[index];
 						const button = buttons[index];
-						console.log(`Adding listener to button ${index} (${direction})`);
 						destroyer.addDisconnect(
 							button,
 							button.connect("notify::is-pressed", () => {
-								console.log(
-									`Button ${index} (${direction}): ${button.is_pressed}`,
-								);
 								if (button.is_pressed) {
 									if (this._direction != direction) {
 										this._direction = direction;
@@ -189,11 +182,51 @@ namespace Gamepad {
 						);
 					}
 				}
-
-				console.log(buttons.map((button, i) => `${i}: ${button.is_pressed}`));
 			};
 			this.connect("notify::buttons", onButtonsChange);
 			onButtonsChange();
+
+			let joystickDirection = GamepadDirection.NONE;
+			this.connect("notify::axes", () => {
+				const axes = this.axes;
+				if (axes.length < 2) {
+					return;
+				}
+				const x = Math.round(axes[0]);
+				const y = Math.round(axes[1]);
+
+				let direction = GamepadDirection.NONE;
+				if (!y) {
+					if (x == 1) {
+						direction = GamepadDirection.RIGHT;
+					}
+					if (x == -1) {
+						direction = GamepadDirection.LEFT;
+					}
+				}
+				if (!x) {
+					if (y == 1) {
+						direction = GamepadDirection.DOWN;
+					}
+					if (y == -1) {
+						direction = GamepadDirection.UP;
+					}
+				}
+				if (joystickDirection != direction) {
+					joystickDirection = direction;
+					if (this._direction != direction) {
+						if (direction == GamepadDirection.NONE) {
+							if (!x && !y) {
+								this._direction = GamepadDirection.NONE;
+								this.notify("direction");
+							}
+						} else {
+							this._direction = direction;
+							this.notify("direction");
+						}
+					}
+				}
+			});
 		}
 
 		private populateButtons(buttons: SerializedGamepadButton[]) {
