@@ -327,6 +327,72 @@ namespace Gamepad {
 				.map((gamepad) => gamepad.gamepad)
 				.sort((a, b) => a.index - b.index);
 		}
+
+		connectForAllGamepads(
+			signal: string,
+			callback: (gamepad: Gamepad.Gamepad) => void,
+			sendOnListUpdate?: boolean,
+		) {
+			const destroyer = new Destroyer();
+			let listDestroyer: Destroyer | null = null;
+			const listUpdate = () => {
+				listDestroyer?.destroy();
+				listDestroyer = new Destroyer();
+				const gamepads = this.gamepads;
+				for (const gamepad of gamepads) {
+					listDestroyer.addDisconnect(
+						gamepad,
+						gamepad.connect(signal, () => callback(gamepad)),
+					);
+					if (sendOnListUpdate) {
+						callback(gamepad);
+					}
+				}
+			};
+			destroyer.addDisconnect(
+				this,
+				this.connect("notify::gamepads", listUpdate),
+			);
+			destroyer.add(() => listDestroyer?.destroy());
+			listUpdate();
+
+			return () => destroyer.destroy();
+		}
+
+		connectForAllGamepadButtons(
+			signal: string,
+			callback: (
+				gamepad: Gamepad.Gamepad,
+				button: Gamepad.GamepadButton,
+				buttonIndex: number,
+			) => void,
+		) {
+			const destroyers = new Map<number, Destroyer>();
+			const destroy = this.connectForAllGamepads(
+				"notify::buttons",
+				(gamepad) => {
+					destroyers.get(gamepad.index)?.destroy();
+					const destroyer = new Destroyer();
+					destroyers.set(gamepad.index, destroyer);
+
+					for (const [buttonIndex, button] of gamepad.buttons.entries()) {
+						destroyer.addDisconnect(
+							button,
+							button.connect(signal, () =>
+								callback(gamepad, button, buttonIndex),
+							),
+						);
+					}
+				},
+				true,
+			);
+			return () => {
+				destroy();
+				for (const destroyer of destroyers.values()) {
+					destroyer.destroy();
+				}
+			};
+		}
 	}
 
 	let instance: GamepadService | null = null;

@@ -1,10 +1,16 @@
-import { createComputed, createState, For } from "gnim";
-import styles from "./gamepad-password-input.style";
+import { createComputed, createState, For, With } from "gnim";
+import styles from "./gamepad-password-input.component.style";
 import Gamepad from "@service/gamepad";
 import { cc } from "@util/string";
 import { Destroyer } from "@util/destroyer";
+import { Gtk } from "ags/gtk4";
 
 const PASSWORD_LENGTH = 6;
+
+const [isFocused, setIsFocused] = createState(false);
+export function getIsPasswordInputFocused() {
+	return isFocused;
+}
 
 abstract class Input {
 	public readonly character: string;
@@ -61,14 +67,18 @@ export function GamepadPasswordInput() {
 		createState<Gamepad.Gamepad | null>(null);
 	const [isSubmitting, setIsSubmitting] = createState(false);
 
+	let focusedControllerDestroyer: Destroyer | null = null;
 	focusedController.subscribe(() => {
+		focusedControllerDestroyer?.destroy();
 		const controller = focusedController.get();
 		if (controller) {
+			setIsFocused(true);
 			console.log("Listening to controller inputs!");
 			// todo: add joystick support
 
 			const destroyer = new Destroyer();
 			destroyer.add(() => buttonsDestroyer?.destroy());
+			focusedControllerDestroyer = destroyer;
 
 			let buttonsDestroyer: Destroyer | null = null;
 			const buttonsUpdate = () => {
@@ -106,6 +116,9 @@ export function GamepadPasswordInput() {
 			};
 			controller.connect("notify::buttons", buttonsUpdate);
 			buttonsUpdate();
+		} else {
+			focusedControllerDestroyer = null;
+			setIsFocused(false);
 		}
 	});
 
@@ -117,6 +130,11 @@ export function GamepadPasswordInput() {
 				.join("");
 			setIsSubmitting(true);
 			console.log(`Password: ${serializedPassword}`);
+			setTimeout(() => {
+				setIsSubmitting(false);
+				setFocusedController(null);
+				setPassword([]);
+			}, 1_500);
 		}
 	});
 
@@ -131,15 +149,62 @@ export function GamepadPasswordInput() {
 					setFocusedController(controller);
 				}
 			}}
+			halign={Gtk.Align.CENTER}
 		>
+			<Gtk.EventControllerFocus
+				onEnter={(self) => {
+					const destroyer = new Destroyer();
+					destroyer.add(
+						gamepad.connectForAllGamepadButtons(
+							"notify::value",
+							(gamepad, button, buttonIndex) => {
+								if (button.value == 1) {
+									if (buttonIndex == 0) {
+										console.log("Focusing password input");
+										setFocusedController(gamepad);
+									}
+								}
+							},
+						),
+					);
+
+					destroyer.addDisconnect(
+						self,
+						self.connect("leave", () => {
+							destroyer.destroy();
+							setFocusedController(null);
+						}),
+					);
+				}}
+			/>
 			<box>
-				<For each={password}>
-					{(input) => (
-						<box>
-							<label label={input.character} />
-						</box>
-					)}
-				</For>
+				<box>
+					<For each={password}>
+						{(input) => (
+							<box>
+								<label
+									label={input.character}
+									cssClasses={[styles.character]}
+								/>
+							</box>
+						)}
+					</For>
+				</box>
+				<box>
+					<With value={password}>
+						{(password) => (
+							<box>
+								{Array(PASSWORD_LENGTH - password.length)
+									.fill(null)
+									.map(() => (
+										<box>
+											<label label="_" cssClasses={[styles.character]} />
+										</box>
+									))}
+							</box>
+						)}
+					</With>
+				</box>
 			</box>
 		</button>
 	);

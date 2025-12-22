@@ -13,11 +13,10 @@ const reloadStyles = createDebouncer(() => {
 app.start({
 	css: "./astal-style.css",
 	instanceName: `${CLASS}_greeter`,
+	iconTheme: "Papirus",
 	main: () => {
 		const monitors = app.get_monitors();
-		for (const monitor of monitors) {
-			GreeterWindow(monitor);
-		}
+		GreeterWindow(monitors[monitors.length - 1]);
 
 		monitorFile("./astal-style.css", () => reloadStyles());
 	},

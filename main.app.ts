@@ -18,6 +18,7 @@ app.start({
 	css: "./astal-style.css",
 	// iconTheme: "Papirus",
 	instanceName: `${CLASS}_main`,
+	iconTheme: "Papirus",
 	main: () => {
 		const monitors = app.get_monitors();
 		for (const monitor of monitors) {

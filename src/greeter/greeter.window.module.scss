@@ -3,5 +3,19 @@
 }
 
 .container {
+	// background: red;
+	min-width: 400px;
+	min-height: 400px;
+}
+
+.background {
 	background: red;
+}
+
+.foregroundContainer {
+	background: purple;
+}
+
+.foreground {
+	background: blue;
 }

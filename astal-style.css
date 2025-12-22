@@ -4,17 +4,20 @@
 }
 
 .greeter-window-module__container___9IIeb {
+  min-width: 400px;
+  min-height: 400px;
+}
+
+.greeter-window-module__background___NuURy {
   background: red;
 }
-.gamepad-password-input-module__container___KWkxt {
-  background: blue;
-  border-radius: 3px;
-  margin: 10px;
-  min-width: 100px;
-  min-height: 20px;
+
+.greeter-window-module__foregroundContainer___ZAtLy {
+  background: purple;
 }
-.gamepad-password-input-module__container___KWkxt.gamepad-password-input-module__focused___H-MNX {
-  background: green;
+
+.greeter-window-module__foreground___bCtmi {
+  background: blue;
 }
 .bar-window-module__window___PBwlQ {
   background: transparent;
@@ -22,8 +25,8 @@
 }
 
 .bar-window-module__container___K5Cgw {
-  background: hsla(165, 228.5714285714%, 97.2549019608%, 0.7);
-  color: #1d1f1f;
+  background: hsla(52.5, 220%, 92.1568627451%, 0.7);
+  color: #161717;
   min-height: 24px;
   padding: 0 12px;
 }
@@ -35,8 +38,8 @@
 }
 
 .launcher-window-module__container___CDvO9 {
-  color: #1d1f1f;
-  background: hsla(165, 228.5714285714%, 97.2549019608%, 0.7);
+  color: #161717;
+  background: hsla(52.5, 220%, 92.1568627451%, 0.7);
   transition: background-color 0.5s;
   border-radius: 10px;
 }
@@ -48,7 +51,7 @@
   outline: none;
 }
 .launcher-window-module__container___CDvO9 .launcher-window-module__entry___fTGyj selection {
-  background: rgba(78, 88, 86, 0.5);
+  background: rgba(72, 80, 79, 0.5);
 }
 .menu-window-module__window___usviS {
   background: transparent;
@@ -56,8 +59,8 @@
 }
 
 .menu-window-module__container___HlsvE {
-  background: hsla(165, 228.5714285714%, 97.2549019608%, 0.7);
-  color: #1d1f1f;
+  background: hsla(52.5, 220%, 92.1568627451%, 0.7);
+  color: #161717;
   padding: 8px;
   border-radius: 8px;
 }
@@ -80,6 +83,112 @@
   background: #fff;
   min-height: 6px;
 }
+.gamepad-password-input-component-module__container___UrYBM {
+  all: unset;
+  background: hsla(52.5, 220%, 92.1568627451%, 0.7);
+  border-radius: 3px;
+  margin: 10px;
+  min-width: 100px;
+  min-height: 20px;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  margin: 4px;
+  font-family: "Kode Mono", monospace;
+  font-size: 64px;
+  padding: 16px 27px;
+  border-radius: 20px;
+}
+.gamepad-password-input-component-module__container___UrYBM.gamepad-password-input-component-module__focused___d6zWU {
+  background: rgb(213, 0, 7.6461538462);
+  padding: 20px 31px;
+  min-height: 88px;
+  outline: none;
+  margin: 0;
+}
+.gamepad-password-input-component-module__container___UrYBM:focus {
+  outline-color: hsl(52.5, 220%, 92.1568627451%);
+}
+.gamepad-password-input-component-module__container___UrYBM .gamepad-password-input-component-module__character___S7tob {
+  padding: 16px 5px;
+  color: #161717;
+}
+.group-component-module__paddingContainer___6b0vW {
+  padding: 4px;
+}
+.group-component-module__paddingContainer___6b0vW .group-component-module__container___4qekT {
+  all: unset;
+  background: hsla(52.5, 220%, 92.1568627451%, 0.7);
+  border-radius: 10px;
+  padding: 3px;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+.group-component-module__paddingContainer___6b0vW .group-component-module__container___4qekT:focus {
+  outline-color: hsl(52.5, 220%, 92.1568627451%);
+}
+
+.group-component-module__button___4baLG {
+  all: unset;
+}
+.power-button-component-module__button___kEhsa {
+  all: unset;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  margin: 4px;
+  padding: 8px;
+  border-radius: 50%;
+}
+.power-button-component-module__button___kEhsa:focus {
+  outline-color: hsl(52.5, 220%, 92.1568627451%);
+}
+.power-button-group-component-module__button___gsYdU {
+  margin-left: 8px;
+  border-radius: 8px;
+  padding: 4px;
+  color: #161717;
+}
+.power-button-group-component-module__button___gsYdU:focus {
+  background: rgb(213, 0, 7.6461538462);
+}
+.power-button-group-component-module__button___gsYdU:first-child {
+  margin-left: 0;
+}
+.session-selector-component-module__container___U7wQJ {
+  all: unset;
+  background: hsla(52.5, 220%, 92.1568627451%, 0.7);
+  border-radius: 10px;
+  padding: 3px;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  margin: 4px;
+}
+.session-selector-component-module__container___U7wQJ.session-selector-component-module__focus___CH2gd {
+  background: hsla(52.5, 220%, 92.1568627451%, 0.7);
+}
+.session-selector-component-module__container___U7wQJ:focus {
+  outline-color: hsl(52.5, 220%, 92.1568627451%);
+}
+
+.session-selector-component-module__session___70Cx- {
+  all: unset;
+  padding: 4px;
+  border-radius: 6px;
+  transition: background 0.15s;
+  font-family: "Kode Mono", monospace;
+  min-height: 24px;
+  color: #161717;
+  font-size: 16px;
+}
+.session-selector-component-module__session___70Cx-.session-selector-component-module__active___CnFDF {
+  background: #428b82;
+  transition: none;
+}
+.session-selector-component-module__session___70Cx-:focus {
+  background: rgb(213, 0, 7.6461538462);
+}
+.session-selector-component-module__session___70Cx-:not(:first-child) {
+  margin-top: 4px;
+}
 .access-point-component-module__revealer___-3WIR .access-point-component-module__extraButton___8k2OH {
   margin-left: 8px;
 }
@@ -94,11 +203,11 @@
   transition: background 0.15s;
   font-family: "Inter";
   min-height: 24px;
-  color: #1d1f1f;
+  color: #161717;
   font-size: 16px;
 }
 .clickable-list-entry-module__button___5GuG3.clickable-list-entry-module__active___laZmU {
-  background: rgb(111.119760479, 129.880239521, 125.5508982036);
+  background: rgb(213, 0, 7.6461538462);
   transition: none;
 }
 .clickable-list-entry-module__button___5GuG3 .clickable-list-entry-module__icon___LTlfS {
@@ -129,7 +238,7 @@
 
 .wireguard-connection-component-module__label___M-ze3 {
   font-family: "Inter";
-  color: #1d1f1f;
+  color: #161717;
   font-size: 16px;
 }
 
@@ -173,8 +282,8 @@
   all: unset;
 }
 .tray-bar-widget-module__button___ceIX2 popover contents {
-  background: hsla(165, 228.5714285714%, 97.2549019608%, 0.7);
-  color: #1d1f1f;
+  background: hsla(52.5, 220%, 92.1568627451%, 0.7);
+  color: #161717;
 }
 .volume-bar-widget-module__button___zKLen {
   all: unset;
@@ -245,6 +354,6 @@
 
 .time-menu-handler-module__calendar___vqh-J {
   background: transparent;
-  color: #1d1f1f;
+  color: #161717;
   border: none;
 }

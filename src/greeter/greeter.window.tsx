@@ -2,16 +2,114 @@ import { CLASS } from "@const/class";
 import { Astal, Gdk, Gtk } from "ags/gtk4";
 import styles from "./greeter.window.style";
 import app from "ags/gtk4/app";
-import { Accessor, createBinding, createState, For, onCleanup } from "gnim";
+import {
+	Accessor,
+	createBinding,
+	createState,
+	For,
+	onCleanup,
+	With,
+} from "gnim";
 import Gamepad from "@service/gamepad";
 import { Destroyer } from "@util/destroyer";
-import { GamepadPasswordInput } from "./widgets/gamepad-password-input.widget";
+import {
+	GamepadPasswordInput,
+	getIsPasswordInputFocused,
+} from "./components/gamepad-password-input/gamepad-password-input.component";
+import { getDesktopSessions } from "@util/desktop-sessions";
+import { IDesktopSession } from "@interface/desktop-session";
+import { SessionSelector } from "./components/session-selector/session-selector.component";
+import { PowerButton } from "./components/power-button/power-button.component";
+import { PowerButtonGroup } from "./components/power-button-group/power-button-group.component";
+
+const SESSION_DIRECTORIES = ["./example-desktop-sessions"];
 
 export function GreeterWindow(gdkMonitor: Gdk.Monitor) {
 	const { TOP, BOTTOM, LEFT, RIGHT } = Astal.WindowAnchor;
 	const [controllerMode, setControllerMode] = createState(false);
+	const [sessions, setSessions] = createState<IDesktopSession[] | null>(null);
+	const [selectedSessionIndex, setSelectedSessionIndex] = createState(0);
 	const gamepad = Gamepad.get_default();
 	const destroyer = new Destroyer();
+	let window: Gtk.Window | null = null;
+
+	getDesktopSessions(SESSION_DIRECTORIES)
+		.then(setSessions)
+		.catch((error) => {
+			console.error(error);
+			setSessions([]);
+		});
+
+	destroyer.add(
+		sessions.subscribe(() => {
+			const sessionsList = sessions.get();
+			const index = selectedSessionIndex.get();
+			if (sessionsList && sessionsList.length <= index) {
+				setSelectedSessionIndex(0);
+			}
+		}),
+	);
+
+	let gamepadsDestroyer: Destroyer | null = null;
+	const destroyers: Destroyer[] = [];
+	const onGamepadsUpdate = () => {
+		gamepadsDestroyer?.destroy();
+		const destroyer = new Destroyer();
+		gamepadsDestroyer = destroyer;
+		destroyers.push(destroyer);
+		const isPasswordInputFocused = getIsPasswordInputFocused();
+
+		for (const controller of gamepad.gamepads) {
+			destroyer.addDisconnect(
+				controller,
+				controller.connect("notify::direction", () => {
+					if (window && !isPasswordInputFocused.get()) {
+						const directions: Record<
+							Gamepad.GamepadDirection,
+							Gtk.DirectionType | null
+						> = {
+							[Gamepad.GamepadDirection.UP]: Gtk.DirectionType.UP,
+							[Gamepad.GamepadDirection.DOWN]: Gtk.DirectionType.DOWN,
+							[Gamepad.GamepadDirection.LEFT]: Gtk.DirectionType.LEFT,
+							[Gamepad.GamepadDirection.RIGHT]: Gtk.DirectionType.RIGHT,
+							[Gamepad.GamepadDirection.NONE]: null,
+						};
+						const direction = directions[controller.direction];
+						if (direction) {
+							window.child_focus(direction);
+						}
+					}
+				}),
+			);
+
+			let buttonsDestroyer: Destroyer | null = null;
+			const onButtonsUpdate = () => {
+				buttonsDestroyer?.destroy();
+				buttonsDestroyer = new Destroyer();
+				const buttons = controller.buttons;
+				for (const [index, button] of buttons.entries()) {
+					buttonsDestroyer.addDisconnect(
+						button,
+						button.connect("notify::value", () => {
+							setControllerMode(true);
+						}),
+					);
+				}
+			};
+			destroyer.addDisconnect(
+				controller,
+				controller.connect("notify::buttons", onButtonsUpdate),
+			);
+			destroyer.add(() => buttonsDestroyer?.destroy());
+			onButtonsUpdate();
+		}
+	};
+	destroyer.addDisconnect(
+		gamepad,
+		gamepad.connect("notify::gamepads", onGamepadsUpdate),
+	);
+	onGamepadsUpdate();
+	destroyer.add(() => gamepadsDestroyer?.destroy());
 
 	onCleanup(() => {
 		destroyer.destroy();
@@ -27,20 +125,79 @@ export function GreeterWindow(gdkMonitor: Gdk.Monitor) {
 			anchor={TOP | LEFT}
 			application={app}
 			namespace={CLASS}
+			keymode={Astal.Keymode.ON_DEMAND}
+			$={(self) => {
+				window = self;
+			}}
 		>
-			<box cssClasses={[styles.container]}>
-				<For
-					each={
-						createBinding(gamepad, "gamepads") as Accessor<Gamepad.Gamepad[]>
-					}
+			<Gtk.EventControllerKey onKeyPressed={() => setControllerMode(false)} />
+			<Gtk.GestureClick onBegin={() => setControllerMode(false)} />
+			<box
+				cssClasses={[styles.container]}
+				orientation={Gtk.Orientation.VERTICAL}
+			>
+				<Gtk.Overlay
+					$={(overlay) => {
+						overlay.add_overlay(
+							(
+								<box
+									hexpand
+									vexpand
+									cssClasses={[styles.foregroundContainer]}
+									orientation={Gtk.Orientation.VERTICAL}
+								>
+									<box>
+										<PowerButtonGroup />
+									</box>
+									<box
+										halign={Gtk.Align.CENTER}
+										valign={Gtk.Align.CENTER}
+										vexpand
+										cssClasses={[styles.foreground]}
+									>
+										<GamepadPasswordInput />
+									</box>
+									<box>
+										<SessionSelector
+											sessions={sessions}
+											selectedIndex={selectedSessionIndex}
+											onChange={(index) => {
+												const sessionsList = sessions.get();
+												if (sessionsList && sessionsList.length > index) {
+													setSelectedSessionIndex(index);
+													console.log(`Setting selected button:`, index);
+												}
+											}}
+										/>
+									</box>
+								</box>
+							) as Gtk.Widget,
+						);
+					}}
 				>
-					{(gamepad) => (
-						<box orientation={Gtk.Orientation.VERTICAL}>
-							<label label={createBinding(gamepad, "direction")} />
-							<GamepadPasswordInput />
-						</box>
-					)}
-				</For>
+					<box cssClasses={[styles.background]} hexpand vexpand></box>
+				</Gtk.Overlay>
+				{/* <box>
+					<With value={controllerMode}>
+						{(controllerMode) =>
+							controllerMode ? (
+								<label label="Controller mode" />
+							) : (
+								<label label="Desktop mode" />
+							)
+						}
+					</With>
+				</box> */}
+
+				{/* <box>
+					<For
+						each={
+							createBinding(gamepad, "gamepads") as Accessor<Gamepad.Gamepad[]>
+						}
+					>
+						{(gamepad) => <box orientation={Gtk.Orientation.VERTICAL}></box>}
+					</For>
+				</box> */}
 			</box>
 		</window>
 	);
