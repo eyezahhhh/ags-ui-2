@@ -1,35 +1,16 @@
 @use "../../../theme.scss";
 
-.container {
-	all: unset;
-	background: theme.$background-transparent;
-	border-radius: 10px;
-	padding: 3px;
-	outline: 2px solid transparent;
-	outline-offset: 2px;
-	margin: 4px;
-
-	&.focus {
-		background: theme.$background-transparent;
-	}
-
-	&:focus {
-		outline-color: theme.$background;
-	}
-}
-
 .session {
 	all: unset;
-	padding: 4px;
+	padding: 4px 8px;
 	border-radius: 6px;
 	transition: background 0.15s;
-	// font-family: theme.$font-main;
-	font-family: theme.$font-monospace;
+	font-family: theme.$font-main;
 	min-height: 24px;
 	color: theme.$text;
 	font-size: 16px;
 
-	&.active {
+	&.focus {
 		background: theme.$background-focus-secondary;
 		transition: none;
 	}

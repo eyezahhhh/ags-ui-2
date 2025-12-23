@@ -1,9 +1,21 @@
-import { createComputed, createState, For, With } from "gnim";
+import {
+	Accessor,
+	createBinding,
+	createComputed,
+	createState,
+	For,
+	onCleanup,
+	With,
+} from "gnim";
 import styles from "./gamepad-password-input.component.style";
 import Gamepad from "@service/gamepad";
 import { cc } from "@util/string";
 import { Destroyer } from "@util/destroyer";
 import { Gtk } from "ags/gtk4";
+import { IDesktopSession } from "@interface/desktop-session";
+import Accounts from "@service/accounts";
+import { Group } from "../group/group.component";
+import AccountsService from "gi://AccountsService?version=1.0";
 
 const PASSWORD_LENGTH = 6;
 
@@ -58,16 +70,28 @@ class ButtonInput extends Input {
 	}
 }
 
-export function GamepadPasswordInput() {
+interface Props {
+	isLoggingIn: Accessor<boolean>;
+	onLoginAttempt: (
+		username: string,
+		password: string,
+		isController: boolean,
+	) => void;
+}
+
+export function GamepadPasswordInput({ isLoggingIn, onLoginAttempt }: Props) {
 	const gamepad = Gamepad.get_default();
 	const [password, setPassword] = createState<(JoystickInput | ButtonInput)[]>(
 		[],
 	);
 	const [focusedController, setFocusedController] =
 		createState<Gamepad.Gamepad | null>(null);
-	const [isSubmitting, setIsSubmitting] = createState(false);
+	const [selectedUserIndex, setSelectedUserIndex] = createState(0);
+	const destroyer = new Destroyer();
+	const accounts = Accounts.get_default();
 
 	let focusedControllerDestroyer: Destroyer | null = null;
+	destroyer.add(() => focusedControllerDestroyer?.destroy());
 	focusedController.subscribe(() => {
 		focusedControllerDestroyer?.destroy();
 		const controller = focusedController.get();
@@ -95,7 +119,7 @@ export function GamepadPasswordInput() {
 							const pressed = button.value == 1;
 							if (buttonsPressed[index] != pressed) {
 								buttonsPressed[index] = pressed;
-								if (!isSubmitting.get() && pressed) {
+								if (!isLoggingIn.get() && pressed) {
 									const inputs = password.get();
 									let blockedChars = "";
 									for (
@@ -122,90 +146,127 @@ export function GamepadPasswordInput() {
 		}
 	});
 
-	password.subscribe(() => {
-		const inputs = password.get();
-		if (inputs.length >= PASSWORD_LENGTH) {
-			const serializedPassword = inputs
-				.map((input) => input.serialize())
-				.join("");
-			setIsSubmitting(true);
-			console.log(`Password: ${serializedPassword}`);
-			setTimeout(() => {
-				setIsSubmitting(false);
+	destroyer.add(
+		password.subscribe(() => {
+			const inputs = password.get();
+			const user = accounts.users[selectedUserIndex.get()];
+			if (inputs.length >= PASSWORD_LENGTH && user) {
+				const serializedPassword = inputs
+					.map((input) => input.serialize())
+					.join("");
+
+				onLoginAttempt(user.get_user_name(), serializedPassword, true);
+			}
+		}),
+	);
+
+	destroyer.addDisconnect(
+		accounts,
+		accounts.connect("notify::users", () => {
+			const usersCount = accounts.users.length;
+			if (selectedUserIndex.get() >= usersCount) {
+				setSelectedUserIndex(usersCount - 1);
+			}
+		}),
+	);
+
+	destroyer.add(
+		isLoggingIn.subscribe(() => {
+			if (!isLoggingIn.get()) {
 				setFocusedController(null);
 				setPassword([]);
-			}, 1_500);
-		}
+			}
+		}),
+	);
+
+	onCleanup(() => {
+		destroyer.destroy();
 	});
 
 	return (
-		<button
-			cssClasses={createComputed([focusedController], (focusedController) =>
-				cc(styles.container, focusedController && styles.focused),
-			)}
-			onClicked={() => {
-				const controller = gamepad.gamepads[0];
-				if (controller) {
-					setFocusedController(controller);
-				}
-			}}
-			halign={Gtk.Align.CENTER}
-		>
-			<Gtk.EventControllerFocus
-				onEnter={(self) => {
-					const destroyer = new Destroyer();
-					destroyer.add(
-						gamepad.connectForAllGamepadButtons(
-							"notify::value",
-							(gamepad, button, buttonIndex) => {
-								if (button.value == 1) {
-									if (buttonIndex == 0) {
-										console.log("Focusing password input");
-										setFocusedController(gamepad);
-									}
-								}
-							},
-						),
-					);
-
-					destroyer.addDisconnect(
-						self,
-						self.connect("leave", () => {
-							destroyer.destroy();
-							setFocusedController(null);
-						}),
-					);
-				}}
-			/>
-			<box>
-				<box>
-					<For each={password}>
-						{(input) => (
-							<box>
-								<label
-									label={input.character}
-									cssClasses={[styles.character]}
-								/>
-							</box>
-						)}
-					</For>
-				</box>
-				<box>
-					<With value={password}>
-						{(password) => (
-							<box>
-								{Array(PASSWORD_LENGTH - password.length)
-									.fill(null)
-									.map(() => (
-										<box>
-											<label label="_" cssClasses={[styles.character]} />
-										</box>
-									))}
-							</box>
-						)}
-					</With>
-				</box>
+		<box orientation={Gtk.Orientation.VERTICAL}>
+			<box hexpand cssClasses={[styles.userSelectContainer]}>
+				<Group
+					selectedIndex={selectedUserIndex}
+					itemCssClasses={[styles.user]}
+					itemCssFocusedClass={styles.focused}
+					onClicked={setSelectedUserIndex}
+				>
+					{createBinding(accounts, "users").as((users) =>
+						users.map((user) => <label label={user.get_user_name()} hexpand />),
+					)}
+				</Group>
 			</box>
-		</button>
+
+			<button
+				cssClasses={createComputed([focusedController], (focusedController) =>
+					cc(styles.container, focusedController && styles.focused),
+				)}
+				onClicked={() => {
+					const controller = gamepad.gamepads[0];
+					if (controller) {
+						setFocusedController(controller);
+					}
+				}}
+				halign={Gtk.Align.CENTER}
+				onRealize={(self) => self.grab_focus()}
+			>
+				<Gtk.EventControllerFocus
+					onEnter={(self) => {
+						const destroyer = new Destroyer();
+						destroyer.add(
+							gamepad.connectForAllGamepadButtons(
+								"notify::value",
+								(gamepad, button, buttonIndex) => {
+									if (button.value == 1) {
+										if (buttonIndex == 0) {
+											console.log("Focusing password input");
+											setFocusedController(gamepad);
+										}
+									}
+								},
+							),
+						);
+
+						destroyer.addDisconnect(
+							self,
+							self.connect("leave", () => {
+								destroyer.destroy();
+								setFocusedController(null);
+							}),
+						);
+					}}
+				/>
+				<box>
+					<box>
+						<For each={password}>
+							{(input) => (
+								<box>
+									<label
+										label={input.character}
+										cssClasses={[styles.character]}
+									/>
+								</box>
+							)}
+						</For>
+					</box>
+					<box>
+						<With value={password}>
+							{(password) => (
+								<box>
+									{Array(PASSWORD_LENGTH - password.length)
+										.fill(null)
+										.map(() => (
+											<box>
+												<label label="_" cssClasses={[styles.character]} />
+											</box>
+										))}
+								</box>
+							)}
+						</With>
+					</box>
+				</box>
+			</button>
+		</box>
 	);
 }

@@ -2,18 +2,18 @@
 
 .paddingContainer {
 	padding: 4px;
+}
 
-	.container {
-		all: unset;
-		background: theme.$background-transparent;
-		border-radius: 10px;
-		padding: 3px;
-		outline: 2px solid transparent;
-		outline-offset: 2px;
+.container {
+	all: unset;
+	background: theme.$background-transparent;
+	border-radius: 10px;
+	padding: 3px;
+	outline: 2px solid transparent;
+	outline-offset: 2px;
 
-		&:focus {
-			outline-color: theme.$background;
-		}
+	&:focus {
+		outline-color: theme.$background;
 	}
 }
 

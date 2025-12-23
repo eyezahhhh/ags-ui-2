@@ -2,14 +2,7 @@ import { CLASS } from "@const/class";
 import { Astal, Gdk, Gtk } from "ags/gtk4";
 import styles from "./greeter.window.style";
 import app from "ags/gtk4/app";
-import {
-	Accessor,
-	createBinding,
-	createState,
-	For,
-	onCleanup,
-	With,
-} from "gnim";
+import { Accessor, createComputed, createState, onCleanup, With } from "gnim";
 import Gamepad from "@service/gamepad";
 import { Destroyer } from "@util/destroyer";
 import {
@@ -19,8 +12,9 @@ import {
 import { getDesktopSessions } from "@util/desktop-sessions";
 import { IDesktopSession } from "@interface/desktop-session";
 import { SessionSelector } from "./components/session-selector/session-selector.component";
-import { PowerButton } from "./components/power-button/power-button.component";
 import { PowerButtonGroup } from "./components/power-button-group/power-button-group.component";
+import { KeyboardPasswordInput } from "./components/keyboard-password-input/keyboard-password-input.component";
+import { LoginSection } from "./components/login-section/login-section.component";
 
 const SESSION_DIRECTORIES = ["./example-desktop-sessions"];
 
@@ -140,12 +134,7 @@ export function GreeterWindow(gdkMonitor: Gdk.Monitor) {
 					$={(overlay) => {
 						overlay.add_overlay(
 							(
-								<box
-									hexpand
-									vexpand
-									cssClasses={[styles.foregroundContainer]}
-									orientation={Gtk.Orientation.VERTICAL}
-								>
+								<box hexpand vexpand orientation={Gtk.Orientation.VERTICAL}>
 									<box>
 										<PowerButtonGroup />
 									</box>
@@ -153,9 +142,14 @@ export function GreeterWindow(gdkMonitor: Gdk.Monitor) {
 										halign={Gtk.Align.CENTER}
 										valign={Gtk.Align.CENTER}
 										vexpand
-										cssClasses={[styles.foreground]}
 									>
-										<GamepadPasswordInput />
+										<LoginSection
+											controllerMode={controllerMode}
+											session={createComputed(
+												[sessions, selectedSessionIndex],
+												(sessions, index) => (sessions || [])[index] || null,
+											)}
+										/>
 									</box>
 									<box>
 										<SessionSelector
@@ -177,27 +171,6 @@ export function GreeterWindow(gdkMonitor: Gdk.Monitor) {
 				>
 					<box cssClasses={[styles.background]} hexpand vexpand></box>
 				</Gtk.Overlay>
-				{/* <box>
-					<With value={controllerMode}>
-						{(controllerMode) =>
-							controllerMode ? (
-								<label label="Controller mode" />
-							) : (
-								<label label="Desktop mode" />
-							)
-						}
-					</With>
-				</box> */}
-
-				{/* <box>
-					<For
-						each={
-							createBinding(gamepad, "gamepads") as Accessor<Gamepad.Gamepad[]>
-						}
-					>
-						{(gamepad) => <box orientation={Gtk.Orientation.VERTICAL}></box>}
-					</For>
-				</box> */}
 			</box>
 		</window>
 	);

@@ -283,6 +283,7 @@ namespace Gamepad {
 			number,
 			{ gamepad: Gamepad; update: (json: SerializedGamepad) => void }
 		>();
+		private _timeout = 0;
 
 		constructor() {
 			super();
@@ -290,7 +291,17 @@ namespace Gamepad {
 			this.listen();
 		}
 
-		listen() {
+		private retryListen() {
+			this._socket?.close();
+			if (this._timeout) {
+				this._timeout = Math.min(16, this._timeout * 2);
+			} else {
+				this._timeout = 1;
+			}
+			setTimeout(() => this.listen(), this._timeout * 1000);
+		}
+
+		private listen() {
 			if (this._socket) {
 				this._socket.close();
 			}
@@ -318,6 +329,16 @@ namespace Gamepad {
 				} catch (e) {
 					console.error(e);
 				}
+			});
+
+			socket.addEventListener("error", () => {
+				console.log("Gamepad socket error");
+				this.retryListen();
+			});
+
+			socket.addEventListener("close", () => {
+				console.log("Gamepad socket closed");
+				this.retryListen();
 			});
 		}
 

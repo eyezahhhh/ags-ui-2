@@ -69,7 +69,7 @@ export function Group({
 						destroyer.add(
 							gamepad.connectForAllGamepadButtons(
 								"notify::value",
-								(gamepad, button, buttonIndex) => {
+								(_gamepad, button, buttonIndex) => {
 									if (button.value == 1) {
 										if (buttonIndex == 0) {
 											const focusedButtonIndex = focusedButton.get();
@@ -77,7 +77,6 @@ export function Group({
 												onClicked?.(focusedButtonIndex);
 											} else if (container?.has_focus) {
 												setFocusedButton(0);
-												console.log("Setting focused button!");
 											}
 										}
 										if (buttonIndex == 1) {
@@ -125,7 +124,6 @@ export function Group({
 											isFocused.get() &&
 											asAccessor(selectedIndex).get() == index.get()
 										) {
-											console.log("ITS TIME TO GRAB FOCUS", index);
 											setTimeout(() => {
 												self.grab_focus();
 											});
@@ -143,7 +141,6 @@ export function Group({
 							>
 								<Gtk.EventControllerFocus
 									onEnter={() => {
-										console.log("Focus given to button", index.get());
 										setFocusedButton(index.get());
 									}}
 								/>
@@ -152,60 +149,6 @@ export function Group({
 						)}
 					</For>
 				</box>
-
-				{/* <With value={asAccessor(sessions) as Accessor<IDesktopSession[] | null>}>
-				{(sessions) =>
-					sessions ? (
-						<box orientation={Gtk.Orientation.VERTICAL}>
-							{sessions.map((session, index) => (
-								<button
-									cssClasses={asAccessor(selectedIndex).as((selectedIndex) =>
-										cc(styles.session, selectedIndex == index && styles.active),
-									)}
-									onClicked={() => onChange?.(index)}
-									cursor={createCursorPointer()}
-									focusable={focusedButton.as(
-										(focusedButton) => focusedButton >= 0,
-									)}
-									onRealize={(self) => {
-										const focusChange = () => {
-											if (
-												isFocused.get() &&
-												asAccessor(selectedIndex).get() == index
-											) {
-												console.log("ITS TIME TO GRAB FOCUS", index);
-												setTimeout(() => {
-													self.grab_focus();
-												});
-											}
-										};
-
-										const destroyer = new Destroyer();
-										destroyer.add(isFocused.subscribe(focusChange));
-										destroyer.addDisconnect(
-											self,
-											self.connect("unrealize", () => destroyer.destroy()),
-										);
-										focusChange();
-									}}
-								>
-									<Gtk.EventControllerFocus
-										onEnter={() => {
-											console.log("Focus given to button", index);
-											setFocusedButton(index);
-										}}
-									/>
-									<label label={session.name} />
-								</button>
-							))}
-						</box>
-					) : (
-						<box>
-							<label label="Loading sessions..." />
-						</box>
-					)
-				}
-			</With> */}
 			</button>
 		</box>
 	);

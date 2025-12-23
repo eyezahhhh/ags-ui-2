@@ -9,15 +9,7 @@
 }
 
 .greeter-window-module__background___NuURy {
-  background: red;
-}
-
-.greeter-window-module__foregroundContainer___ZAtLy {
-  background: purple;
-}
-
-.greeter-window-module__foreground___bCtmi {
-  background: blue;
+  background: rgba(0, 0, 0, 0.4);
 }
 .bar-window-module__window___PBwlQ {
   background: transparent;
@@ -83,6 +75,30 @@
   background: #fff;
   min-height: 6px;
 }
+.gamepad-password-input-component-module__userSelectContainer___685a7 {
+  margin-bottom: 8px;
+}
+.gamepad-password-input-component-module__userSelectContainer___685a7 .gamepad-password-input-component-module__user___eZIxk {
+  all: unset;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background 0.15s;
+  font-family: "Inter";
+  min-height: 24px;
+  color: #161717;
+  font-size: 16px;
+}
+.gamepad-password-input-component-module__userSelectContainer___685a7 .gamepad-password-input-component-module__user___eZIxk.gamepad-password-input-component-module__focused___d6zWU {
+  background: #428b82;
+  transition: none;
+}
+.gamepad-password-input-component-module__userSelectContainer___685a7 .gamepad-password-input-component-module__user___eZIxk:focus {
+  background: rgb(213, 0, 7.6461538462);
+}
+.gamepad-password-input-component-module__userSelectContainer___685a7 .gamepad-password-input-component-module__user___eZIxk:not(:first-child) {
+  margin-top: 4px;
+}
+
 .gamepad-password-input-component-module__container___UrYBM {
   all: unset;
   background: hsla(52.5, 220%, 92.1568627451%, 0.7);
@@ -115,7 +131,8 @@
 .group-component-module__paddingContainer___6b0vW {
   padding: 4px;
 }
-.group-component-module__paddingContainer___6b0vW .group-component-module__container___4qekT {
+
+.group-component-module__container___4qekT {
   all: unset;
   background: hsla(52.5, 220%, 92.1568627451%, 0.7);
   border-radius: 10px;
@@ -123,22 +140,33 @@
   outline: 2px solid transparent;
   outline-offset: 2px;
 }
-.group-component-module__paddingContainer___6b0vW .group-component-module__container___4qekT:focus {
+.group-component-module__container___4qekT:focus {
   outline-color: hsl(52.5, 220%, 92.1568627451%);
 }
 
 .group-component-module__button___4baLG {
   all: unset;
 }
-.power-button-component-module__button___kEhsa {
+.keyboard-password-input-component-module__container___SA-0Q {
+  background: hsla(52.5, 220%, 92.1568627451%, 0.7);
+  padding: 8px 12px;
+  border-radius: 16px;
+}
+
+.keyboard-password-input-component-module__entry___--7Nn {
   all: unset;
+  background: hsla(52.5, 220%, 92.1568627451%, 0.7);
+  margin: 6px 0;
+  border-radius: 10px;
+  color: #161717;
+  caret-color: #161717;
   outline: 2px solid transparent;
   outline-offset: 2px;
-  margin: 4px;
-  padding: 8px;
-  border-radius: 50%;
+  font-size: 16px;
+  padding: 6px 8px;
+  border: none;
 }
-.power-button-component-module__button___kEhsa:focus {
+.keyboard-password-input-component-module__entry___--7Nn:focus-within, .keyboard-password-input-component-module__entry___--7Nn:active {
   outline-color: hsl(52.5, 220%, 92.1568627451%);
 }
 .power-button-group-component-module__button___gsYdU {
@@ -153,33 +181,17 @@
 .power-button-group-component-module__button___gsYdU:first-child {
   margin-left: 0;
 }
-.session-selector-component-module__container___U7wQJ {
-  all: unset;
-  background: hsla(52.5, 220%, 92.1568627451%, 0.7);
-  border-radius: 10px;
-  padding: 3px;
-  outline: 2px solid transparent;
-  outline-offset: 2px;
-  margin: 4px;
-}
-.session-selector-component-module__container___U7wQJ.session-selector-component-module__focus___CH2gd {
-  background: hsla(52.5, 220%, 92.1568627451%, 0.7);
-}
-.session-selector-component-module__container___U7wQJ:focus {
-  outline-color: hsl(52.5, 220%, 92.1568627451%);
-}
-
 .session-selector-component-module__session___70Cx- {
   all: unset;
-  padding: 4px;
+  padding: 4px 8px;
   border-radius: 6px;
   transition: background 0.15s;
-  font-family: "Kode Mono", monospace;
+  font-family: "Inter";
   min-height: 24px;
   color: #161717;
   font-size: 16px;
 }
-.session-selector-component-module__session___70Cx-.session-selector-component-module__active___CnFDF {
+.session-selector-component-module__session___70Cx-.session-selector-component-module__focus___CH2gd {
   background: #428b82;
   transition: none;
 }

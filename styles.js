@@ -78,16 +78,18 @@ async function buildAll() {
 	console.log(`Styles updated at ${OUT_CSS}`);
 }
 
-const watcher = new Watcher(`src`, {
-	recursive: true,
-	ignoreInitial: true,
-});
+if (process.argv.includes("--watch")) {
+	const watcher = new Watcher(`src`, {
+		recursive: true,
+		ignoreInitial: true,
+	});
 
-watcher.on("all", (_eventName, path) => {
-	if (path.toLowerCase().endsWith(".style.ts")) {
-		return;
-	}
-	buildAll();
-});
+	watcher.on("all", (_eventName, path) => {
+		if (path.toLowerCase().endsWith(".style.ts")) {
+			return;
+		}
+		buildAll();
+	});
+}
 
 buildAll();

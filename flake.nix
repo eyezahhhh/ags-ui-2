@@ -19,61 +19,49 @@
       packages = forAllSystems (system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
-
-          # --- Define shared packages here ---
-          astalPackages = with ags.packages.${system}; [
-            io
-            astal4
-            network
-            apps
-            battery
-            hyprland
-            wireplumber
-            tray
-            notifd
-            mpris
-            bluetooth
-            auth
-            greet
-            powerprofiles
-          ];
-
-          extraPackages = astalPackages ++ [
-            pkgs.libadwaita
-            pkgs.libsoup_3
-          ];
+          # Include your existing astal/extra packages logic here...
+          astalPackages = with ags.packages.${system}; [ /* ... */ ];
+          extraPackages = astalPackages ++ [ pkgs.libadwaita /* ... */ ];
 
           pname = "my-shell";
-          entry = "app.ts";
         in
         {
           default = pkgs.stdenv.mkDerivation {
-            name = pname;
-            src = ./.;
+            inherit pname;
+            version = "0.1.0";
+            src = ./.; # Nix will see your pre-compiled CSS and types here
 
-            # dontWrapQtApps = true;
-
-            nativeBuildInputs = with pkgs; [
-              wrapGAppsHook4 # Switched to 4 for GTK4/Astal4
-              gobject-introspection
+            nativeBuildInputs = [
+              pkgs.wrapGAppsHook4
+              pkgs.gobject-introspection
               ags.packages.${system}.default
             ];
 
             buildInputs = extraPackages ++ [ pkgs.gjs ];
 
-            # This ensures the font is available at runtime
-            propagatedBuildInputs = [
-              pkgs.kode-mono
-              pkgs.papirus-icon-theme
-              pkgs.hicolor-icon-theme
-            ];
-
             installPhase = ''
               runHook preInstall
+  
               mkdir -p $out/bin
-              mkdir -p $out/share
-              cp -r * $out/share
-              ags bundle ${entry} $out/bin/${pname} -d "SRC='$out/share'"
+              mkdir -p $out/share/my-shell
+  
+              # 1. Copy everything to the share directory
+              # This includes your precompiled astal-style.css and types/
+              cp -r * $out/share/my-shell
+  
+              # 2. Bundle the Main Shell
+              # We set the root to the share directory so relative imports work
+              ags bundle $out/share/my-shell/main.app.ts $out/bin/my-shell \
+                -r $out/share/my-shell \
+                -g 4 \
+                -d "SRC='$out/share/my-shell'"
+
+              # 3. Bundle the Greeter
+              ags bundle $out/share/my-shell/greeter.app.ts $out/bin/my-greeter \
+                -r $out/share/my-shell \
+                -g 4 \
+                -d "SRC='$out/share/my-shell'"
+    
               runHook postInstall
             '';
           };

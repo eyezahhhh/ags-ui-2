@@ -37,7 +37,6 @@ export class UnixSocket extends Emitter<UnixSocketEvents> {
 				this.readLoop(dataStream);
 			} catch (e) {
 				this.emit("error", e as Error);
-				console.error(e);
 			}
 		});
 
