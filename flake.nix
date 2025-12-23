@@ -35,6 +35,7 @@
               pkgs.wrapGAppsHook4
               pkgs.gobject-introspection
               ags.packages.${system}.default
+              pkgs.makeWrapper
             ];
 
             buildInputs = extraPackages ++ [ pkgs.gjs ];
@@ -63,6 +64,13 @@
                 -d "SRC='$out/share/my-shell'"
     
               runHook postInstall
+            '';
+
+            postFixup = ''
+              for bin in $out/bin/*; do
+                wrapProgram "$bin" \
+                  --prefix GI_TYPELIB_PATH : "${pkgs.lib.makeSearchPath "lib/girepository-1.0" extraPackages}"
+              done
             '';
           };
         }
