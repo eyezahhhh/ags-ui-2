@@ -8,14 +8,25 @@ import { LauncherWindow } from "./src/main/launcher/launcher.window";
 import Gamepad from "@service/gamepad";
 import { CLASS } from "@const/class";
 
+declare global {
+	var SRC: string;
+}
+
+if (!("SRC" in globalThis)) {
+	globalThis.SRC = ".";
+}
+
+console.log(`SRC:`, globalThis.SRC);
+
 const reloadStyles = createDebouncer(() => {
 	app.reset_css();
-	app.apply_css("./astal-style.css");
+	app.apply_css(`${globalThis.SRC}/astal-style.css`);
 	console.log("Reloaded CSS.");
 }, 100);
 
 app.start({
-	css: "./astal-style.css",
+	// css: "./astal-style.css",
+	css: `${globalThis.SRC}/astal-style.css`,
 	// iconTheme: "Papirus",
 	instanceName: `${CLASS}_main`,
 	iconTheme: "Papirus",
@@ -27,7 +38,7 @@ app.start({
 		MenuWindow();
 		// LauncherWindow();
 
-		monitorFile("./astal-style.css", () => reloadStyles());
+		monitorFile(`${globalThis.SRC}/astal-style.css`, () => reloadStyles());
 
 		WireGuard.get_default(); // load WireGuard before it's visually needed
 	},
