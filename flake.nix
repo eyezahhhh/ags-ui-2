@@ -2,7 +2,7 @@
   description = "My Awesome Desktop Shell";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
     ags = {
       url = "github:aylur/ags";
@@ -13,86 +13,96 @@
   outputs = { self, nixpkgs, ags, ... }:
     let
       systems = [ "x86_64-linux" "aarch64-linux" ];
-      forAllSystems = f: nixpkgs.lib.genAttrs systems (system: f system);
+      forAllSystems = nixpkgs.lib.genAttrs systems;
     in
     {
       packages = forAllSystems (system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
-          # Include your existing astal/extra packages logic here...
-          astalPackages = with ags.packages.${system}; [ astal4 ];
-          extraPackages = astalPackages ++ [ pkgs.libadwaita /* ... */ ];
 
-          pname = "my-shell";
+          # ---- Runtime deps (GI typelibs live here) ----
+          runtimeDeps = [
+            pkgs.gjs
+            ags.packages.${system}.astal4
+            ags.packages.${system}.apps
+            ags.packages.${system}.auth
+            ags.packages.${system}.battery
+            ags.packages.${system}.bluetooth
+            ags.packages.${system}.cava
+            ags.packages.${system}.greet
+            ags.packages.${system}.hyprland
+            ags.packages.${system}.io
+            ags.packages.${system}.mpris
+            ags.packages.${system}.network
+            ags.packages.${system}.notifd
+            ags.packages.${system}.powerprofiles
+            ags.packages.${system}.tray
+            ags.packages.${system}.wireplumber
+            pkgs.libadwaita
+          ];
         in
         {
           default = pkgs.stdenv.mkDerivation {
-            inherit pname;
+            pname = "my-shell";
             version = "0.1.0";
-            src = ./.; # Nix will see your pre-compiled CSS and types here
+            src = ./.;
 
+            # ---- Build-time hooks ----
             nativeBuildInputs = [
               pkgs.wrapGAppsHook4
               pkgs.gobject-introspection
               ags.packages.${system}.default
-              pkgs.makeWrapper
             ];
 
-            buildInputs = extraPackages ++ [ pkgs.gjs ];
+            # ---- Runtime inputs (picked up by wrapGAppsHook4) ----
+            buildInputs = runtimeDeps;
 
             installPhase = ''
               runHook preInstall
-  
+
               mkdir -p $out/bin
               mkdir -p $out/share/my-shell
-  
-              # 1. Copy everything to the share directory
-              # This includes your precompiled astal-style.css and types/
-              cp -r * $out/share/my-shell
-  
-              # 2. Bundle the Main Shell
-              # We set the root to the share directory so relative imports work
-              ags bundle $out/share/my-shell/main.app.ts $out/bin/my-shell \
+
+              # Copy source (JS, CSS, types, assets)
+              cp -r . $out/share/my-shell
+
+              # Bundle main shell
+              ags bundle \
+                $out/share/my-shell/main.app.ts \
+                $out/bin/my-shell \
                 -r $out/share/my-shell \
                 -g 4 \
                 -d "SRC='$out/share/my-shell'"
 
-              # 3. Bundle the Greeter
-              ags bundle $out/share/my-shell/greeter.app.ts $out/bin/my-greeter \
+              # Bundle greeter
+              ags bundle \
+                $out/share/my-shell/greeter.app.ts \
+                $out/bin/my-greeter \
                 -r $out/share/my-shell \
                 -g 4 \
                 -d "SRC='$out/share/my-shell'"
-    
+
               runHook postInstall
-            '';
-
-            postFixup = ''
-              for bin in $out/bin/*; do
-                wrapProgram "$bin" \
-                  --prefix GI_TYPELIB_PATH : "${pkgs.lib.makeSearchPath "lib/girepository-1.0" extraPackages}"
-              done
             '';
           };
         }
       );
 
+      # ---- Dev shell (matches runtime exactly) ----
       devShells = forAllSystems (system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
-          # Pull the extraPackages defined in the packages block above
-          # or just redefine the same logic if preferred. 
-          # A cleaner way is to define extraPackages inside forAllSystems 
-          # but outside both 'packages' and 'devShells'.
-
-          # For simplicity in this specific flake structure:
-          shellExtraPackages = self.packages.${system}.default.buildInputs;
         in
         {
           default = pkgs.mkShell {
+            nativeBuildInputs = [
+              ags.packages.${system}.default
+            ];
+
             buildInputs = [
-              (ags.packages.${system}.default.override {
-                extraPackages = shellExtraPackages;
-              })
+              pkgs.gjs
+              ags.packages.${system}.astal4
+              pkgs.libadwaita
             ];
           };
         }
