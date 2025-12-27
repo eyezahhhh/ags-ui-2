@@ -20,7 +20,7 @@
         let
           pkgs = nixpkgs.legacyPackages.${system};
           # Include your existing astal/extra packages logic here...
-          astalPackages = with ags.packages.${system}; [ /* ... */ ];
+          astalPackages = with ags.packages.${system}; [ astal4 ];
           extraPackages = astalPackages ++ [ pkgs.libadwaita /* ... */ ];
 
           pname = "my-shell";
