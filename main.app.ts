@@ -5,7 +5,6 @@ import { BarWindow } from "./src/main/bar/bar.window";
 import { MenuWindow } from "./src/main/menu/menu.window";
 import WireGuard from "@service/wireguard";
 import { LauncherWindow } from "./src/main/launcher/launcher.window";
-import Gamepad from "@service/gamepad";
 import { CLASS } from "@const/class";
 import { ROOT } from "@const/root";
 
@@ -29,12 +28,10 @@ app.start({
 			BarWindow(monitor);
 		}
 		MenuWindow();
-		// LauncherWindow();
+		LauncherWindow();
 
 		monitorFile(`${ROOT}/astal-style.css`, () => reloadStyles());
 
 		WireGuard.get_default(); // load WireGuard before it's visually needed
 	},
 });
-
-Gamepad.get_default();

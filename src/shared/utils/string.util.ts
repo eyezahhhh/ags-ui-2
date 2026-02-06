@@ -51,7 +51,7 @@ export function formatTime(seconds: number): string {
 			if (secondValue) {
 				return `${mainValue} ${plural(
 					mainKey,
-					mainValue
+					mainValue,
 				)}, ${secondValue} ${plural(secondKey, secondValue)}`;
 			}
 		}
@@ -60,4 +60,20 @@ export function formatTime(seconds: number): string {
 	}
 
 	throw new Error("End of time loop reached");
+}
+
+export function toSearchParams(
+	params: Record<string, string>,
+	shouldEncode: boolean,
+) {
+	const encode = shouldEncode ? encodeURIComponent : (value: string) => value;
+
+	let string = "";
+	for (let param of Object.keys(params)) {
+		if (string) {
+			string += "&";
+		}
+		string += `${encode(param)}=${encode(params[param])}`;
+	}
+	return string;
 }

@@ -2,7 +2,7 @@
   description = "My Awesome Desktop Shell";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
 
     ags = {
       url = "github:aylur/ags";
@@ -10,102 +10,80 @@
     };
   };
 
-  outputs = { self, nixpkgs, ags, ... }:
+  outputs =
+    { self
+    , nixpkgs
+    , ags
+    ,
+    }:
     let
-      systems = [ "x86_64-linux" "aarch64-linux" ];
-      forAllSystems = nixpkgs.lib.genAttrs systems;
+      system = "aarch64-linux";
+      pkgs = nixpkgs.legacyPackages.${system};
+      pname = "my-shell";
+      entry = "app.ts";
+
+      astalPackages = with ags.packages.${system}; [
+        io
+        astal4 # or astal3 for gtk3
+        apps
+        auth
+        battery
+        bluetooth
+        cava
+        greet
+        hyprland
+        mpris
+        network
+        notifd
+        powerprofiles
+        tray
+        wireplumber
+        # notifd tray wireplumber
+      ];
+
+      extraPackages =
+        astalPackages
+        ++ [
+          pkgs.libadwaita
+          pkgs.libsoup_3
+          pkgs.glib-networking
+        ];
     in
     {
-      packages = forAllSystems (system:
-        let
-          pkgs = nixpkgs.legacyPackages.${system};
+      packages.${system} = {
+        default = pkgs.stdenv.mkDerivation {
+          name = pname;
+          src = ./.;
 
-          # ---- Runtime deps (GI typelibs live here) ----
-          runtimeDeps = [
-            pkgs.gjs
-            ags.packages.${system}.astal4
-            ags.packages.${system}.apps
-            ags.packages.${system}.auth
-            ags.packages.${system}.battery
-            ags.packages.${system}.bluetooth
-            ags.packages.${system}.cava
-            ags.packages.${system}.greet
-            ags.packages.${system}.hyprland
-            ags.packages.${system}.io
-            ags.packages.${system}.mpris
-            ags.packages.${system}.network
-            ags.packages.${system}.notifd
-            ags.packages.${system}.powerprofiles
-            ags.packages.${system}.tray
-            ags.packages.${system}.wireplumber
-            pkgs.libadwaita
+          nativeBuildInputs = with pkgs; [
+            wrapGAppsHook3
+            gobject-introspection
+            ags.packages.${system}.default
           ];
-        in
-        {
-          default = pkgs.stdenv.mkDerivation {
-            pname = "my-shell";
-            version = "0.1.0";
-            src = ./.;
 
-            # ---- Build-time hooks ----
-            nativeBuildInputs = [
-              pkgs.wrapGAppsHook4
-              pkgs.gobject-introspection
-              ags.packages.${system}.default
-            ];
+          buildInputs = extraPackages ++ [ pkgs.gjs ];
 
-            # ---- Runtime inputs (picked up by wrapGAppsHook4) ----
-            buildInputs = runtimeDeps;
+          installPhase = ''
+            runHook preInstall
 
-            installPhase = ''
-              runHook preInstall
+            mkdir -p $out/bin
+            mkdir -p $out/share
+            cp -r * $out/share
+            ags bundle ${entry} $out/bin/${pname} -d "SRC='$out/share'"
 
-              mkdir -p $out/bin
-              mkdir -p $out/share/my-shell
+            runHook postInstall
+          '';
+        };
+      };
 
-              # Copy source (JS, CSS, types, assets)
-              cp -r . $out/share/my-shell
-
-              # Bundle main shell
-              ags bundle \
-                $out/share/my-shell/main.app.ts \
-                $out/bin/my-shell \
-                -r $out/share/my-shell \
-                -g 4 \
-                -d "SRC='$out/share/my-shell'"
-
-              # Bundle greeter
-              ags bundle \
-                $out/share/my-shell/greeter.app.ts \
-                $out/bin/my-greeter \
-                -r $out/share/my-shell \
-                -g 4 \
-                -d "SRC='$out/share/my-shell'"
-
-              runHook postInstall
-            '';
-          };
-        }
-      );
-
-      # ---- Dev shell (matches runtime exactly) ----
-      devShells = forAllSystems (system:
-        let
-          pkgs = nixpkgs.legacyPackages.${system};
-        in
-        {
-          default = pkgs.mkShell {
-            nativeBuildInputs = [
-              ags.packages.${system}.default
-            ];
-
-            buildInputs = [
-              pkgs.gjs
-              ags.packages.${system}.astal4
-              pkgs.libadwaita
-            ];
-          };
-        }
-      );
+      devShells.${system} = {
+        default = pkgs.mkShell {
+          buildInputs = [
+            (ags.packages.${system}.default.override {
+              inherit extraPackages;
+            })
+          ];
+        };
+      };
     };
 }

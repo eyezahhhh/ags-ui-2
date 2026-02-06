@@ -1,8 +1,8 @@
 import Gio from "gi://Gio?version=2.0";
 import GLib from "gi://GLib?version=2.0";
 
-export function getFileType(file: Gio.File) {
-	return new Promise<Gio.FileType>((resolve, reject) => {
+export function getFileInfo(file: Gio.File) {
+	return new Promise<Gio.FileInfo>((resolve, reject) => {
 		file.query_info_async(
 			"standard::type",
 			Gio.FileQueryInfoFlags.NONE,
@@ -10,14 +10,18 @@ export function getFileType(file: Gio.File) {
 			null,
 			(_file, result) => {
 				try {
-					const info = file.query_info_finish(result);
-					resolve(info.get_file_type());
+					resolve(file.query_info_finish(result));
 				} catch (e) {
 					reject(e);
 				}
 			},
 		);
 	});
+}
+
+export async function getFileType(file: Gio.File) {
+	const info = await getFileInfo(file);
+	return info.get_file_type();
 }
 
 export function makeDirectory(file: Gio.File) {

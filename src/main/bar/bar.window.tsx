@@ -2,7 +2,6 @@ import { Astal, Gdk } from "ags/gtk4";
 import { CLASS } from "constants/class.const";
 import styles from "./bar.window.style";
 import app from "ags/gtk4/app";
-import AstalHyprland from "gi://AstalHyprland?version=0.1";
 import { createBinding } from "gnim";
 import { With } from "ags";
 import { getWindowIcon } from "@util/icon";
@@ -23,6 +22,7 @@ import Hyprshade from "@service/hyprshade";
 import { BrightnessBarWidget } from "./widgets/brightness/brightness.bar-widget";
 import { DisplayMenuHandler } from "main/menu/handlers/display/display.menu-handler";
 import { TrayBarWidget } from "./widgets/tray/tray.bar-widget";
+import AstalHyprland from "gi://AstalHyprland";
 
 Hyprshade.get_default();
 
