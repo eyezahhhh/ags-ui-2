@@ -12,6 +12,8 @@ import { CalcLauncherHandler } from "./handlers/calc/calc.launcher-handler";
 import { CodeLauncherHandler } from "./handlers/code/code.launcher-handler";
 import { DictionaryLauncherHandler } from "./handlers/dictionary/dictionary.launcher-handler";
 import { FirefoxLauncherHandler } from "./handlers/firefox/firefox.launcher-handler";
+import { TodoLauncherHandler } from "./handlers/todo/todo.launcher-handler";
+import { WallpaperLauncherHandler } from "./handlers/wallpaper/wallpaper.launcher-handler";
 
 interface Section {
 	handler: LauncherHandler;
@@ -32,7 +34,9 @@ export function LauncherWindow() {
 	>(null);
 
 	const handlers: LauncherHandler[] = [
+		new TodoLauncherHandler(setQuery),
 		new CodeLauncherHandler(setQuery),
+		new WallpaperLauncherHandler(setQuery),
 		new FirefoxLauncherHandler(setQuery),
 		new AppsLauncherHandler(setQuery),
 		new DictionaryLauncherHandler(setQuery),
@@ -175,7 +179,7 @@ export function LauncherWindow() {
 	) as Gtk.Entry;
 	const window = (
 		<window
-			visible
+			visible={false}
 			name="launcher"
 			class={`${CLASS}_launcher`}
 			exclusivity={Astal.Exclusivity.EXCLUSIVE}
