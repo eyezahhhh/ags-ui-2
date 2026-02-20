@@ -14,11 +14,10 @@
     { self
     , nixpkgs
     , ags
-    ,
+    , ...
     }:
     let
-      pname = "my-shell";
-      entry = "app.ts";
+      pname = "eyezah-ui";
 
       systems = [
         "x86_64-linux"
@@ -27,6 +26,16 @@
 
       forEachSystem = f:
         nixpkgs.lib.genAttrs systems (system:
+          f system nixpkgs.legacyPackages.${system}
+        );
+    in
+    {
+      ############################################################
+      # Configurable builder function
+      ############################################################
+
+      lib = {
+        mkEyezahUI = system: { instanceId ? "eyezah-ui" }:
           let
             pkgs = nixpkgs.legacyPackages.${system};
 
@@ -56,44 +65,130 @@
                 pkgs.glib-networking
               ];
           in
-          f system pkgs extraPackages
-        );
-    in
-    {
-      packages = forEachSystem (system: pkgs: extraPackages: {
-        default = pkgs.stdenv.mkDerivation {
-          name = pname;
-          src = ./.;
+          pkgs.stdenv.mkDerivation {
+            name = pname;
+            src = ./.;
 
-          nativeBuildInputs = with pkgs; [
-            wrapGAppsHook3
-            gobject-introspection
-            ags.packages.${system}.default
-          ];
+            nativeBuildInputs = [
+              pkgs.wrapGAppsHook4
+              pkgs.gobject-introspection
+              ags.packages.${system}.default
+              pkgs.nodejs_24
+            ];
 
-          buildInputs = extraPackages ++ [ pkgs.gjs ];
+            buildInputs = extraPackages ++ [
+              pkgs.gjs
+              pkgs.nodejs_24
+            ];
 
-          installPhase = ''
-            runHook preInstall
+            buildPhase = ''
+              runHook preBuild
 
-            mkdir -p $out/bin
-            mkdir -p $out/share
-            cp -r * $out/share
-            ags bundle ${entry} $out/bin/${pname} -d "SRC='$out/share'"
+              echo "Current directory:"
+              pwd
+              ls -la
 
-            runHook postInstall
-          '';
-        };
+              npm ci --omit=dev
+
+              runHook postBuild
+            '';
+
+            installPhase = ''
+              runHook preInstall
+
+              mkdir -p $out/bin
+              mkdir -p $out/share
+              cp -r * $out/share
+
+              ags bundle main.app.ts \
+                $out/bin/${pname} \
+                --root . \
+                --gtk 4 \
+                -d "SRC='$out/share'" \
+                -d "INSTANCE_ID='${instanceId}'"
+
+              runHook postInstall
+            '';
+          };
+      };
+
+      ############################################################
+      # Default package (flake-valid derivation)
+      ############################################################
+
+      packages = forEachSystem (system: pkgs: {
+        default = self.lib.mkEyezahUI system { };
       });
 
-      devShells = forEachSystem (system: pkgs: extraPackages: {
-        default = pkgs.mkShell {
-          buildInputs = [
-            (ags.packages.${system}.default.override {
-              inherit extraPackages;
-            })
+      ############################################################
+      # Dev shell
+      ############################################################
+
+      devShells = forEachSystem (system: pkgs:
+        let
+          astalPackages = with ags.packages.${system}; [
+            io
+            astal4
+            apps
+            auth
+            battery
+            bluetooth
+            cava
+            greet
+            hyprland
+            mpris
+            network
+            notifd
+            powerprofiles
+            tray
+            wireplumber
           ];
+
+          extraPackages =
+            astalPackages ++ [
+              pkgs.libadwaita
+              pkgs.libsoup_3
+              pkgs.glib-networking
+              pkgs.nodejs_24
+            ];
+        in
+        {
+          default = pkgs.mkShell {
+            buildInputs = [
+              (ags.packages.${system}.default.override {
+                inherit extraPackages;
+              })
+            ];
+          };
+        }
+      );
+
+      ############################################################
+      # Home Manager module
+      ############################################################
+
+      homeManagerModules.default = { config, lib, pkgs, ... }:
+        let
+          cfg = config.programs.eyezah-ui;
+        in
+        {
+          options.programs.eyezah-ui = {
+            enable = lib.mkEnableOption "Eyezah UI";
+
+            instanceId = lib.mkOption {
+              type = lib.types.str;
+              default = "eyezah-ui";
+              description = "Astal instance ID used during build.";
+            };
+          };
+
+          config = lib.mkIf cfg.enable {
+            home.packages = [
+              (self.lib.mkEyezahUI pkgs.system {
+                instanceId = cfg.instanceId;
+              })
+            ];
+          };
         };
-      });
     };
 }

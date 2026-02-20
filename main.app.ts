@@ -77,16 +77,21 @@ app.start({
 			createCommandProcess(
 				[
 					"node",
-					"styles.js",
+					`${ROOT}/script/generate-styles.js`,
 					"--output-file",
 					`${CACHE_DIRECTORY}/style.css`,
 					"--wallust-file",
 					WALLUST_FILE,
+					"--wallust-cache-file",
+					`${CACHE_DIRECTORY}/wallust.scss`,
 					"--watch",
 				],
 				{
 					onStdout: (stdout) => {
 						console.log("[SCSS MONITOR]:", stdout);
+					},
+					onStderr: (stderr) => {
+						console.error("[SCSS MONITOR]:", stderr);
 					},
 				},
 			);

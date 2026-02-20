@@ -4,10 +4,6 @@ import * as sass from "sass";
 import postcss from "postcss";
 import postcssModules from "postcss-modules";
 import Watcher from "watcher";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const SRC_DIR = "./src";
 
@@ -68,7 +64,7 @@ async function processFile(filePath) {
 	}
 }
 
-async function buildAll(outputFile, wallustFile) {
+async function buildAll(outputFile, wallustFile, wallustCacheFile) {
 	try {
 		if (!wallustFile) {
 			throw new Error("Wallust file not specified");
@@ -80,12 +76,12 @@ async function buildAll(outputFile, wallustFile) {
 			throw new Error(`Wallust path isn't a file`);
 		}
 		writeFileSync(
-			`${__dirname}/wallust.scss`,
+			wallustCacheFile,
 			`@forward ${JSON.stringify(wallustFile.replace(/\\/g, "/"))};`,
 		);
 		console.log("Imported Wallust values.");
 	} catch (e) {
-		writeFileSync(`${__dirname}/wallust.scss`, WALLUST_DEFAULT);
+		writeFileSync(wallustCacheFile, WALLUST_DEFAULT);
 		console.log("Written Wallust default values.");
 	}
 
@@ -154,6 +150,10 @@ if (!outputFile) {
 	throw new Error("--output-file not defined");
 }
 const wallustFile = getFlag("--wallust-file");
+const wallustCacheFile = getFlag("--wallust-cache-file");
+if (wallustFile && !wallustCacheFile) {
+	throw new Error("--wallust-cache-file not defined");
+}
 
 if (getBoolean("--watch")) {
 	const watcher = new Watcher(`src`, {
@@ -165,7 +165,7 @@ if (getBoolean("--watch")) {
 		if (path.toLowerCase().endsWith(".style.ts")) {
 			return;
 		}
-		buildAll(outputFile, wallustFile);
+		buildAll(outputFile, wallustFile, wallustCacheFile);
 	});
 
 	if (wallustFile) {
@@ -175,10 +175,10 @@ if (getBoolean("--watch")) {
 		}).on("all", (eventName) => {
 			if (eventName == "change") {
 				console.log("Wallust file changed.");
-				buildAll(outputFile, wallustFile);
+				buildAll(outputFile, wallustFile, wallustCacheFile);
 			}
 		});
 	}
 }
 
-buildAll(outputFile, wallustFile);
+buildAll(outputFile, wallustFile, wallustCacheFile);
