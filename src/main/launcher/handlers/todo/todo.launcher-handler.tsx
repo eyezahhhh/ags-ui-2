@@ -45,7 +45,6 @@ export class TodoLauncherHandler extends LauncherHandler {
 			});
 		}
 		this.entries = lines;
-		console.log(lines);
 		this.setEnabled(true);
 		this.triggerUpdate(null);
 	}

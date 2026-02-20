@@ -1,12 +1,38 @@
-import fs from "node:fs";
+import fs, { writeFileSync } from "node:fs";
 import path from "node:path";
 import * as sass from "sass";
 import postcss from "postcss";
 import postcssModules from "postcss-modules";
 import Watcher from "watcher";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const SRC_DIR = "./src";
-const OUT_CSS = "./astal-style.css";
+
+const WALLUST_DEFAULT = `
+$wallust-background: #1C2023;
+$wallust-foreground: #C7CCD1;
+$wallust-cursor: #C7CCD1;
+
+$wallust-color0: #1C2023;
+$wallust-color1: #C7AE95;
+$wallust-color2: #95C7AE;
+$wallust-color3: #AEC795;
+$wallust-color4: #AE95C7;
+$wallust-color5: #C795AE;
+$wallust-color6: #95AEC7;
+$wallust-color7: #C7CCD1;
+$wallust-color8: #747C84;
+$wallust-color9: #C7AE95;
+$wallust-color10: #95C7AE;
+$wallust-color11: #AEC795;
+$wallust-color12: #AE95C7;
+$wallust-color13: #C795AE;
+$wallust-color14: #95AEC7;
+$wallust-color15: #F3F4F5;
+`;
 
 const getPlugins = (tsFileName) => [
 	postcssModules({
@@ -23,7 +49,7 @@ const getPlugins = (tsFileName) => [
 ];
 
 async function processFile(filePath) {
-	if (path.basename(filePath).startsWith("_")) return;
+	if (path.basename(filePath).startsWith("_")) return "";
 
 	const tsFileName =
 		filePath.substring(0, filePath.length - "module.scss".length) + "style.ts";
@@ -42,7 +68,27 @@ async function processFile(filePath) {
 	}
 }
 
-async function buildAll() {
+async function buildAll(outputFile, wallustFile) {
+	try {
+		if (!wallustFile) {
+			throw new Error("Wallust file not specified");
+		}
+		const stats = fs.statSync(wallustFile, {
+			throwIfNoEntry: true,
+		});
+		if (!stats.isFile()) {
+			throw new Error(`Wallust path isn't a file`);
+		}
+		writeFileSync(
+			`${__dirname}/wallust.scss`,
+			`@forward ${JSON.stringify(wallustFile.replace(/\\/g, "/"))};`,
+		);
+		console.log("Imported Wallust values.");
+	} catch (e) {
+		writeFileSync(`${__dirname}/wallust.scss`, WALLUST_DEFAULT);
+		console.log("Written Wallust default values.");
+	}
+
 	console.log("Compiling CSS Modules...");
 	const files = fs
 		.readdirSync(SRC_DIR, { recursive: true })
@@ -74,11 +120,42 @@ async function buildAll() {
 		}
 	}
 
-	fs.writeFileSync(OUT_CSS, globalCss);
-	console.log(`Styles updated at ${OUT_CSS}`);
+	fs.writeFileSync(outputFile, globalCss);
+	console.log(`Styles updated at ${outputFile}`);
 }
 
-if (process.argv.includes("--watch")) {
+const args = [...process.argv];
+function getFlag(flag) {
+	if (!flag.startsWith("--")) {
+		throw new Error(`Flag "${flag}" doesn't start with --`);
+	}
+	for (let i = 0; i < args.length; i++) {
+		if (args[i] == flag) {
+			if (i == args.length - 1) {
+				throw new Error(`Option not provided for "${flag}"`);
+			}
+			const value = args[i + 1];
+			args.splice(i, 2);
+			return value;
+		}
+	}
+
+	return null;
+}
+function getBoolean(flag) {
+	if (!flag.startsWith("--")) {
+		throw new Error(`Flag "${flag}" doesn't start with --`);
+	}
+	return args.includes(flag);
+}
+
+const outputFile = getFlag("--output-file");
+if (!outputFile) {
+	throw new Error("--output-file not defined");
+}
+const wallustFile = getFlag("--wallust-file");
+
+if (getBoolean("--watch")) {
 	const watcher = new Watcher(`src`, {
 		recursive: true,
 		ignoreInitial: true,
@@ -88,8 +165,20 @@ if (process.argv.includes("--watch")) {
 		if (path.toLowerCase().endsWith(".style.ts")) {
 			return;
 		}
-		buildAll();
+		buildAll(outputFile, wallustFile);
 	});
+
+	if (wallustFile) {
+		new Watcher(wallustFile, {
+			recursive: false,
+			ignoreInitial: true,
+		}).on("all", (eventName) => {
+			if (eventName == "change") {
+				console.log("Wallust file changed.");
+				buildAll(outputFile, wallustFile);
+			}
+		});
+	}
 }
 
-buildAll();
+buildAll(outputFile, wallustFile);

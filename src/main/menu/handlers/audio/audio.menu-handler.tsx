@@ -49,6 +49,7 @@ export class AudioMenuHandler extends MenuHandler {
 							wp.defaultSpeaker.set_volume(self.value / 100);
 						}}
 						cssClasses={[sliderStyles.slider]}
+						cursor={createCursorPointer()}
 					/>
 				</box>
 				<box orientation={Gtk.Orientation.VERTICAL} hexpand>

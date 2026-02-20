@@ -1,7 +1,9 @@
 {
 	"scripts": {
-		"dev:greeter": "concurrently --kill-others-on-fail 'node styles.js --watch' 'nodemon -e ts,tsx -i \"**/*.style.ts\" -x \"ags run -d . --gtk 4 greeter.app.ts\"'",
-		"dev:main": "concurrently --kill-others-on-fail 'node styles.js --watch' 'nodemon -e ts,tsx -i \"**/*.style.ts\" -x \"ags run -d . --gtk 4 main.app.ts\"'",
+		"dev:greeter": "nodemon -e ts,tsx -i \"**/*.style.ts\" -x \"ags run -d . --gtk 4 greeter.app.ts --define DEV=true\"",
+		"dev:main": "nodemon -e ts,tsx -i \"**/*.style.ts\" -x \"ags run -d . --gtk 4 main.app.ts --define DEV=true\"",
+		"start:greeter": "ags run -d . --gtk 4 greeter.app.ts",
+		"start:main": "ags run -d . --gtk 4 main.app.ts",
 		"format:check": "prettier -c src",
 		"format:write": "prettier -w src",
 		"generate-types": "npm ci && ags types -d . -u"
@@ -17,6 +19,7 @@
 	},
 	"devDependencies": {
 		"concurrently": "^9.2.1",
+		"nodemon": "^3.1.13",
 		"postcss": "^8.5.6",
 		"postcss-modules": "^6.0.1",
 		"prettier": "^3.6.2",

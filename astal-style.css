@@ -17,8 +17,8 @@
 }
 
 .bar-window-module__container___K5Cgw {
-  background: hsla(52.5, 220%, 92.1568627451%, 0.7);
-  color: #161717;
+  background: hsla(210, 209.8039215686%, 80%, 0.7);
+  color: #1C2023;
   min-height: 24px;
   padding: 0 12px;
 }
@@ -30,8 +30,8 @@
 }
 
 .launcher-window-module__container___CDvO9 {
-  color: #161717;
-  background: hsla(52.5, 220%, 92.1568627451%, 0.7);
+  color: #1C2023;
+  background: hsla(210, 209.8039215686%, 80%, 0.7);
   transition: background-color 0.5s;
   border-radius: 10px;
 }
@@ -43,7 +43,7 @@
   outline: none;
 }
 .launcher-window-module__container___CDvO9 .launcher-window-module__input___MVjUl selection {
-  background: rgba(72, 80, 79, 0.5);
+  background: rgba(199, 174, 149, 0.5);
 }
 .launcher-window-module__container___CDvO9 .launcher-window-module__categories___rzitc {
   padding: 10px;
@@ -68,7 +68,7 @@
   font-size: 1.2rem;
 }
 .launcher-window-module__container___CDvO9 .launcher-window-module__categories___rzitc .launcher-window-module__category___W40Su .launcher-window-module__categoryEntry___MC3Jt:focus {
-  background: rgb(213, 0, 7.6461538462);
+  background: rgb(160.962962963, 85.037037037, 123);
 }
 .launcher-window-module__container___CDvO9 .launcher-window-module__loadingIcons___bTnrN {
   margin: 10px;
@@ -83,8 +83,8 @@
 }
 
 .menu-window-module__container___HlsvE {
-  background: hsla(52.5, 220%, 92.1568627451%, 0.7);
-  color: #161717;
+  background: hsla(210, 209.8039215686%, 80%, 0.7);
+  color: #1C2023;
   padding: 8px;
   border-radius: 8px;
 }
@@ -117,15 +117,15 @@
   transition: background 0.15s;
   font-family: "Inter";
   min-height: 24px;
-  color: #161717;
+  color: #1C2023;
   font-size: 16px;
 }
 .gamepad-password-input-component-module__userSelectContainer___685a7 .gamepad-password-input-component-module__user___eZIxk.gamepad-password-input-component-module__focused___d6zWU {
-  background: #428b82;
+  background: #ae95c7;
   transition: none;
 }
 .gamepad-password-input-component-module__userSelectContainer___685a7 .gamepad-password-input-component-module__user___eZIxk:focus {
-  background: rgb(213, 0, 7.6461538462);
+  background: rgb(160.962962963, 85.037037037, 123);
 }
 .gamepad-password-input-component-module__userSelectContainer___685a7 .gamepad-password-input-component-module__user___eZIxk:not(:first-child) {
   margin-top: 4px;
@@ -133,7 +133,7 @@
 
 .gamepad-password-input-component-module__container___UrYBM {
   all: unset;
-  background: hsla(52.5, 220%, 92.1568627451%, 0.7);
+  background: hsla(210, 209.8039215686%, 80%, 0.7);
   border-radius: 3px;
   margin: 10px;
   min-width: 100px;
@@ -147,18 +147,18 @@
   border-radius: 20px;
 }
 .gamepad-password-input-component-module__container___UrYBM.gamepad-password-input-component-module__focused___d6zWU {
-  background: rgb(213, 0, 7.6461538462);
+  background: rgb(160.962962963, 85.037037037, 123);
   padding: 20px 31px;
   min-height: 88px;
   outline: none;
   margin: 0;
 }
 .gamepad-password-input-component-module__container___UrYBM:focus {
-  outline-color: hsl(52.5, 220%, 92.1568627451%);
+  outline-color: hsl(210, 209.8039215686%, 80%);
 }
 .gamepad-password-input-component-module__container___UrYBM .gamepad-password-input-component-module__character___S7tob {
   padding: 16px 5px;
-  color: #161717;
+  color: #1C2023;
 }
 .group-component-module__paddingContainer___6b0vW {
   padding: 4px;
@@ -166,32 +166,32 @@
 
 .group-component-module__container___4qekT {
   all: unset;
-  background: hsla(52.5, 220%, 92.1568627451%, 0.7);
+  background: hsla(210, 209.8039215686%, 80%, 0.7);
   border-radius: 10px;
   padding: 3px;
   outline: 2px solid transparent;
   outline-offset: 2px;
 }
 .group-component-module__container___4qekT:focus {
-  outline-color: hsl(52.5, 220%, 92.1568627451%);
+  outline-color: hsl(210, 209.8039215686%, 80%);
 }
 
 .group-component-module__button___4baLG {
   all: unset;
 }
 .keyboard-password-input-component-module__container___SA-0Q {
-  background: hsla(52.5, 220%, 92.1568627451%, 0.7);
+  background: hsla(210, 209.8039215686%, 80%, 0.7);
   padding: 8px 12px;
   border-radius: 16px;
 }
 
 .keyboard-password-input-component-module__entry___--7Nn {
   all: unset;
-  background: hsla(52.5, 220%, 92.1568627451%, 0.7);
+  background: hsla(210, 209.8039215686%, 80%, 0.7);
   margin: 6px 0;
   border-radius: 10px;
-  color: #161717;
-  caret-color: #161717;
+  color: #1C2023;
+  caret-color: #1C2023;
   outline: 2px solid transparent;
   outline-offset: 2px;
   font-size: 16px;
@@ -199,16 +199,16 @@
   border: none;
 }
 .keyboard-password-input-component-module__entry___--7Nn:focus-within, .keyboard-password-input-component-module__entry___--7Nn:active {
-  outline-color: hsl(52.5, 220%, 92.1568627451%);
+  outline-color: hsl(210, 209.8039215686%, 80%);
 }
 .power-button-group-component-module__button___gsYdU {
   margin-left: 8px;
   border-radius: 8px;
   padding: 4px;
-  color: #161717;
+  color: #1C2023;
 }
 .power-button-group-component-module__button___gsYdU:focus {
-  background: rgb(213, 0, 7.6461538462);
+  background: rgb(160.962962963, 85.037037037, 123);
 }
 .power-button-group-component-module__button___gsYdU:first-child {
   margin-left: 0;
@@ -220,15 +220,15 @@
   transition: background 0.15s;
   font-family: "Inter";
   min-height: 24px;
-  color: #161717;
+  color: #1C2023;
   font-size: 16px;
 }
 .session-selector-component-module__session___70Cx-.session-selector-component-module__focus___CH2gd {
-  background: #428b82;
+  background: #ae95c7;
   transition: none;
 }
 .session-selector-component-module__session___70Cx-:focus {
-  background: rgb(213, 0, 7.6461538462);
+  background: rgb(160.962962963, 85.037037037, 123);
 }
 .session-selector-component-module__session___70Cx-:not(:first-child) {
   margin-top: 4px;
@@ -247,11 +247,11 @@
   transition: background 0.15s;
   font-family: "Inter";
   min-height: 24px;
-  color: #161717;
+  color: #1C2023;
   font-size: 16px;
 }
 .clickable-list-entry-module__button___5GuG3.clickable-list-entry-module__active___laZmU {
-  background: rgb(213, 0, 7.6461538462);
+  background: rgb(160.962962963, 85.037037037, 123);
   transition: none;
 }
 .clickable-list-entry-module__button___5GuG3 .clickable-list-entry-module__icon___LTlfS {
@@ -282,7 +282,7 @@
 
 .wireguard-connection-component-module__label___M-ze3 {
   font-family: "Inter";
-  color: #161717;
+  color: #1C2023;
   font-size: 16px;
 }
 
@@ -290,6 +290,34 @@
   font-family: "Inter";
   color: #464646;
   font-size: 14px;
+}
+.slider-window-module__window___KOeHj {
+  background: transparent;
+}
+
+.slider-window-module__overlayContainer___MOP8n {
+  margin-right: 16px;
+}
+
+.slider-window-module__slider___nXKaD {
+  all: unset;
+  padding: 10px;
+}
+.slider-window-module__slider___nXKaD trough {
+  min-width: 200px;
+  background: rgba(70, 70, 70, 0.3);
+  min-height: 32px;
+  border: none;
+  border-radius: 5px;
+}
+.slider-window-module__slider___nXKaD trough slider {
+  background: #fff;
+  border: none;
+  opacity: 0;
+}
+.slider-window-module__slider___nXKaD highlight {
+  background: #ae95c7;
+  border-radius: 0;
 }
 .battery-bar-widget-module__button___YGwUI {
   all: unset;
@@ -326,8 +354,8 @@
   all: unset;
 }
 .tray-bar-widget-module__button___ceIX2 popover contents {
-  background: hsla(52.5, 220%, 92.1568627451%, 0.7);
-  color: #161717;
+  background: hsla(210, 209.8039215686%, 80%, 0.7);
+  color: #1C2023;
 }
 .volume-bar-widget-module__button___zKLen {
   all: unset;
@@ -345,7 +373,7 @@
 }
 .apps-launcher-handler-module__container___GoUYW .apps-launcher-handler-module__launch___3dGXg {
   border: none;
-  background: hsla(52.5, 220%, 92.1568627451%, 0.7);
+  background: hsla(210, 209.8039215686%, 80%, 0.7);
   outline: none;
   box-shadow: none;
   text-shadow: none;
@@ -354,7 +382,7 @@
   margin-top: 20px;
 }
 .apps-launcher-handler-module__container___GoUYW .apps-launcher-handler-module__launch___3dGXg:hover, .apps-launcher-handler-module__container___GoUYW .apps-launcher-handler-module__launch___3dGXg:focus {
-  background: rgb(213, 0, 7.6461538462);
+  background: rgb(160.962962963, 85.037037037, 123);
 }
 .calc-launcher-handler-module__container___pF0YH .calc-launcher-handler-module__leftSide___mf0Wi {
   font-size: 1.3rem;
@@ -375,7 +403,7 @@
   font-size: 1.2rem;
 }
 .code-launcher-handler-module__entry___bIPq4:focus, .code-launcher-handler-module__entry___bIPq4:hover {
-  background: rgb(213, 0, 7.6461538462);
+  background: rgb(160.962962963, 85.037037037, 123);
 }
 .dictionary-launcher-handler-module__container___lelyW {
   margin-bottom: 20px;
@@ -468,6 +496,6 @@
 
 .time-menu-handler-module__calendar___vqh-J {
   background: transparent;
-  color: #161717;
+  color: #1C2023;
   border: none;
 }

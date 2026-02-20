@@ -33,7 +33,7 @@ export class DisplayMenuHandler extends MenuHandler {
 						}
 					>
 						{(device) =>
-							device && (
+							device?.type == "backlight" && (
 								<box cssClasses={[styles.sliderSection]}>
 									<slider
 										hexpand
@@ -45,6 +45,7 @@ export class DisplayMenuHandler extends MenuHandler {
 											device.brightness = value;
 										}}
 										cssClasses={[sliderStyles.slider]}
+										cursor={createCursorPointer()}
 									/>
 								</box>
 							)

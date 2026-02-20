@@ -1,4 +1,4 @@
-import { Astal, Gdk } from "ags/gtk4";
+import { Astal, Gdk, Gtk } from "ags/gtk4";
 import { CLASS } from "constants/class.const";
 import styles from "./bar.window.style";
 import app from "ags/gtk4/app";
@@ -31,13 +31,15 @@ export function BarWindow(gdkMonitor: Gdk.Monitor) {
 
 	const RIGHT_WIDGETS = [
 		// <label label="❤️" />,
-		<TrayBarWidget />,
-		<VolumeBarWidget onClicked={() => toggleMenu(AudioMenuHandler)} />,
+		() => <TrayBarWidget />,
+		() => <VolumeBarWidget onClicked={() => toggleMenu(AudioMenuHandler)} />,
 		// <BluetoothBarWidget onClicked={() => toggleMenu(BluetoothMenuHandler)} />,
-		<BrightnessBarWidget onClicked={() => toggleMenu(DisplayMenuHandler)} />,
-		<NetworkBarWidget onClicked={() => toggleMenu(NetworkMenuHandler)} />,
-		<BatteryBarWidget onClicked={() => toggleMenu(PowerMenuHandler)} />,
-		<ClockBarWidget onClicked={() => toggleMenu(TimeMenuHandler)} />,
+		() => (
+			<BrightnessBarWidget onClicked={() => toggleMenu(DisplayMenuHandler)} />
+		),
+		() => <NetworkBarWidget onClicked={() => toggleMenu(NetworkMenuHandler)} />,
+		() => <BatteryBarWidget onClicked={() => toggleMenu(PowerMenuHandler)} />,
+		() => <ClockBarWidget onClicked={() => toggleMenu(TimeMenuHandler)} />,
 	] as const;
 
 	const hyprland = AstalHyprland.get_default();
@@ -90,11 +92,11 @@ export function BarWindow(gdkMonitor: Gdk.Monitor) {
 					</box>
 					<box $type="end">
 						{RIGHT_WIDGETS.map((widget) => (
-							<box>{widget}</box>
+							<box>{widget()}</box>
 						))}
 					</box>
 				</centerbox>
 			</box>
 		</window>
-	);
+	) as Gtk.Window;
 }

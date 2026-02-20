@@ -1,11 +1,13 @@
 import { HOME } from "@const/home";
+import { CommandPromise } from "@interface/command-promise";
+import { CommandTerminationError } from "@interface/command-termination-error";
 import { createCommandProcess } from "@util/cli";
 import { scanDirectory } from "@util/file";
 import app from "ags/gtk4/app";
-import { execAsync } from "ags/process";
 import Gio from "gi://Gio?version=2.0";
 import GObject, { getter, register } from "gnim/gobject";
 
+const DEFAULT_THEME = "ashes-dark";
 const WALLPAPER_DIR = `${HOME}/.config/wallpaper`;
 const MUTABLE_WALLPAPER_DIR = `${HOME}/nix/assets/wallpapers`;
 
@@ -64,11 +66,14 @@ export namespace Wallpaper {
 		private wallpaperChangeTimeout: ReturnType<typeof setTimeout> | null = null;
 		private _current: WallpaperFile | null = null;
 		private minDimensions: [number, number] = [0, 0];
+		private commandInstance: CommandPromise<any> | null = null;
 
 		constructor() {
 			super();
 
-			this.loadWallpaperList().catch(console.error);
+			this.loadWallpaperList()
+				.then(() => this.setRandomWallpaper())
+				.catch(console.error);
 		}
 
 		@getter(Object)
@@ -154,6 +159,10 @@ export namespace Wallpaper {
 		}
 
 		public async setRandomWallpaper() {
+			if (!this._files.length) {
+				throw new Error("No wallpapers loaded");
+			}
+
 			if (this.wallpaperChangeTimeout) {
 				clearTimeout(this.wallpaperChangeTimeout);
 				this.wallpaperChangeTimeout = null;
@@ -214,6 +223,11 @@ export namespace Wallpaper {
 			return this._current;
 		}
 
+		@getter(Boolean)
+		get is_loading_colors() {
+			return !!this.commandInstance;
+		}
+
 		set current(wallpaper: WallpaperFile) {
 			if (this._current == wallpaper) {
 				return;
@@ -226,12 +240,47 @@ export namespace Wallpaper {
 				this.notify("is_current_set");
 			}
 
+			this.commandInstance?.kill();
+
+			console.log(`wallust run ${wallpaper.getPath()} --skip-sequences`);
+
 			const promise = createCommandProcess([
 				"wallust",
 				"run",
 				wallpaper.getPath(),
 				"--skip-sequences",
 			]);
+			this.commandInstance = promise;
+			this.notify("is_loading_colors");
+
+			promise
+				.then(() => {
+					if (this.commandInstance == promise) {
+						this.commandInstance = null;
+						this.notify("is_loading_colors");
+					}
+				})
+				.catch((e) => {
+					if (e instanceof CommandTerminationError) {
+						return;
+					}
+					console.error(
+						`Failed to generate wallust palette for file "${wallpaper.getPath()}", using fallback theme.`,
+					);
+					const promise = createCommandProcess([
+						"wallust",
+						"theme",
+						DEFAULT_THEME,
+						"--skip-sequences",
+					]);
+					this.commandInstance = promise;
+					promise.finally(() => {
+						if (this.commandInstance == promise) {
+							this.commandInstance = null;
+							this.notify("is_loading_colors");
+						}
+					});
+				});
 		}
 	}
 

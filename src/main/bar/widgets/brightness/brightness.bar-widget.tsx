@@ -38,7 +38,7 @@ export function BrightnessBarWidget({ onClicked }: Props) {
 								>
 									<image
 										iconName={
-											device
+											device?.type == "backlight"
 												? createBinding(device, "icon")
 												: "display-brightness-symbolic"
 										}

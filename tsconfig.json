@@ -31,6 +31,9 @@
       ],
       "@util/*": [
         "shared/utils/*.util"
+      ],
+      "@window/*": [
+        "shared/windows/*.window"
       ]
     },
     "strict": true,

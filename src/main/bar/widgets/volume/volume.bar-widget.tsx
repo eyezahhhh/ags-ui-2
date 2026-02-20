@@ -28,9 +28,20 @@ export function VolumeBarWidget({ onClicked }: Props) {
 				);
 
 				return (
-					<button onClicked={onClicked} cssClasses={[styles.button]} cursor={createCursorPointer()}>
+					<button
+						onClicked={onClicked}
+						cssClasses={[styles.button]}
+						cursor={createCursorPointer()}
+					>
 						<box>
-							<Gtk.EventControllerScroll flags={Gtk.EventControllerScrollFlags.VERTICAL} onScroll={(_event, _x, y) => wp.defaultSpeaker.set_volume(Math.min(wp.defaultSpeaker.volume + y / 200, 1))} />
+							<Gtk.EventControllerScroll
+								flags={Gtk.EventControllerScrollFlags.VERTICAL}
+								onScroll={(_event, _x, y) =>
+									wp.defaultSpeaker.set_volume(
+										Math.min(wp.defaultSpeaker.volume - y / 200, 1),
+									)
+								}
+							/>
 							<image iconName={computed.as((args) => getVolumeIcon(...args))} />
 							<revealer
 								revealChild={revealerVisible}

@@ -17,40 +17,50 @@
     ,
     }:
     let
-      system = "aarch64-linux";
-      pkgs = nixpkgs.legacyPackages.${system};
       pname = "my-shell";
       entry = "app.ts";
 
-      astalPackages = with ags.packages.${system}; [
-        io
-        astal4 # or astal3 for gtk3
-        apps
-        auth
-        battery
-        bluetooth
-        cava
-        greet
-        hyprland
-        mpris
-        network
-        notifd
-        powerprofiles
-        tray
-        wireplumber
-        # notifd tray wireplumber
+      systems = [
+        "x86_64-linux"
+        "aarch64-linux"
       ];
 
-      extraPackages =
-        astalPackages
-        ++ [
-          pkgs.libadwaita
-          pkgs.libsoup_3
-          pkgs.glib-networking
-        ];
+      forEachSystem = f:
+        nixpkgs.lib.genAttrs systems (system:
+          let
+            pkgs = nixpkgs.legacyPackages.${system};
+
+            astalPackages = with ags.packages.${system}; [
+              io
+              astal4
+              apps
+              auth
+              battery
+              bluetooth
+              cava
+              greet
+              hyprland
+              mpris
+              network
+              notifd
+              powerprofiles
+              tray
+              wireplumber
+            ];
+
+            extraPackages =
+              astalPackages
+              ++ [
+                pkgs.libadwaita
+                pkgs.libsoup_3
+                pkgs.glib-networking
+              ];
+          in
+          f system pkgs extraPackages
+        );
     in
     {
-      packages.${system} = {
+      packages = forEachSystem (system: pkgs: extraPackages: {
         default = pkgs.stdenv.mkDerivation {
           name = pname;
           src = ./.;
@@ -74,9 +84,9 @@
             runHook postInstall
           '';
         };
-      };
+      });
 
-      devShells.${system} = {
+      devShells = forEachSystem (system: pkgs: extraPackages: {
         default = pkgs.mkShell {
           buildInputs = [
             (ags.packages.${system}.default.override {
@@ -84,6 +94,6 @@
             })
           ];
         };
-      };
+      });
     };
 }
