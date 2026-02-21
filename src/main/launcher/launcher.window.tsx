@@ -187,7 +187,7 @@ export function LauncherWindow() {
 			application={app}
 			namespace={CLASS}
 			cssClasses={[styles.window]}
-			anchor={TOP | RIGHT}
+			// anchor={TOP | RIGHT}
 			$={(self) => {
 				self.connect("notify::visible", (window) => {
 					if (window.is_visible()) {
