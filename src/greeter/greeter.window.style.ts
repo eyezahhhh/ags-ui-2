@@ -1,6 +1,6 @@
 const styles = {
-    "window": "greeter-window-module__window___4TCTc",
-    "container": "greeter-window-module__container___9IIeb",
-    "background": "greeter-window-module__background___NuURy"
+    "window": "src-greeter-greeter-window-module-scss__window",
+    "container": "src-greeter-greeter-window-module-scss__container",
+    "background": "src-greeter-greeter-window-module-scss__background"
 };
 export default styles;

@@ -1,4 +1,4 @@
 const styles = {
-    "button": "clock-bar-widget-module__button___2Ie4T"
+    "button": "src-main-bar-widgets-clock-clock-bar-widget-module-scss__button"
 };
 export default styles;

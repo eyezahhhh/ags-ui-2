@@ -1,5 +1,5 @@
 const styles = {
-    "session": "session-selector-component-module__session___70Cx-",
-    "focus": "session-selector-component-module__focus___CH2gd"
+    "session": "src-greeter-components-session-selector-session-selector-component-module-scss__session",
+    "focus": "src-greeter-components-session-selector-session-selector-component-module-scss__focus"
 };
 export default styles;

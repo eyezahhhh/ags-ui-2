@@ -1,8 +1,8 @@
 const styles = {
-    "button": "clickable-list-entry-module__button___5GuG3",
-    "active": "clickable-list-entry-module__active___laZmU",
-    "icon": "clickable-list-entry-module__icon___LTlfS",
-    "subLabel": "clickable-list-entry-module__subLabel___5BvNz",
-    "endLabel": "clickable-list-entry-module__endLabel___yd5iu"
+    "button": "src-shared-components-clickable-list-entry-clickable-list-entry-module-scss__button",
+    "active": "src-shared-components-clickable-list-entry-clickable-list-entry-module-scss__active",
+    "icon": "src-shared-components-clickable-list-entry-clickable-list-entry-module-scss__icon",
+    "subLabel": "src-shared-components-clickable-list-entry-clickable-list-entry-module-scss__subLabel",
+    "endLabel": "src-shared-components-clickable-list-entry-clickable-list-entry-module-scss__endLabel"
 };
 export default styles;

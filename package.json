@@ -1,4 +1,6 @@
 {
+	"name": "eyezah-ui",
+	"version": "2.0.0",
 	"scripts": {
 		"dev:greeter": "nodemon -e ts,tsx -i \"**/*.style.ts\" -x \"ags run -d . --gtk 4 greeter.app.ts --define DEV=true\"",
 		"dev:main": "nodemon -e ts,tsx -i \"**/*.style.ts\" -x \"ags run -d . --gtk 4 main.app.ts --define DEV=true\"",

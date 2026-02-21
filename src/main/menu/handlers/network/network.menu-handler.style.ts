@@ -1,12 +1,12 @@
 const styles = {
-    "wireguardSection": "network-menu-handler-module__wireguardSection___qrBNp",
-    "noneActive": "network-menu-handler-module__noneActive___gT-y9",
-    "wireguardConnection": "network-menu-handler-module__wireguardConnection___GtKKO",
-    "passwordRevealContainer": "network-menu-handler-module__passwordRevealContainer___z-k80",
-    "passwordTextContainer": "network-menu-handler-module__passwordTextContainer___T4ykO",
-    "passwordLockIcon": "network-menu-handler-module__passwordLockIcon___iGoIi",
-    "wifiSectionButtons": "network-menu-handler-module__wifiSectionButtons___79jQC",
-    "wifiSectionButton": "network-menu-handler-module__wifiSectionButton___BMKjZ",
-    "accessPoints": "network-menu-handler-module__accessPoints___XLcUD"
+    "wireguardSection": "src-main-menu-handlers-network-network-menu-handler-module-scss__wireguardSection",
+    "noneActive": "src-main-menu-handlers-network-network-menu-handler-module-scss__noneActive",
+    "wireguardConnection": "src-main-menu-handlers-network-network-menu-handler-module-scss__wireguardConnection",
+    "passwordRevealContainer": "src-main-menu-handlers-network-network-menu-handler-module-scss__passwordRevealContainer",
+    "passwordTextContainer": "src-main-menu-handlers-network-network-menu-handler-module-scss__passwordTextContainer",
+    "passwordLockIcon": "src-main-menu-handlers-network-network-menu-handler-module-scss__passwordLockIcon",
+    "wifiSectionButtons": "src-main-menu-handlers-network-network-menu-handler-module-scss__wifiSectionButtons",
+    "wifiSectionButton": "src-main-menu-handlers-network-network-menu-handler-module-scss__wifiSectionButton",
+    "accessPoints": "src-main-menu-handlers-network-network-menu-handler-module-scss__accessPoints"
 };
 export default styles;

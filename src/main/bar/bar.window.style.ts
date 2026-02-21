@@ -1,7 +1,7 @@
 const styles = {
-    "window": "bar-window-module__window___PBwlQ",
-    "container": "bar-window-module__container___K5Cgw",
-    "currentApp": "bar-window-module__currentApp___4UcTt",
-    "appIcon": "bar-window-module__appIcon___HYZPn"
+    "window": "src-main-bar-bar-window-module-scss__window",
+    "container": "src-main-bar-bar-window-module-scss__container",
+    "currentApp": "src-main-bar-bar-window-module-scss__currentApp",
+    "appIcon": "src-main-bar-bar-window-module-scss__appIcon"
 };
 export default styles;

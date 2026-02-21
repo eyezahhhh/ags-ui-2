@@ -1,7 +1,7 @@
 const styles = {
-    "container": "apps-launcher-handler-module__container___GoUYW",
-    "name": "apps-launcher-handler-module__name___r5o4g",
-    "description": "apps-launcher-handler-module__description___SCmOE",
-    "launch": "apps-launcher-handler-module__launch___3dGXg"
+    "container": "src-main-launcher-handlers-apps-apps-launcher-handler-module-scss__container",
+    "name": "src-main-launcher-handlers-apps-apps-launcher-handler-module-scss__name",
+    "description": "src-main-launcher-handlers-apps-apps-launcher-handler-module-scss__description",
+    "launch": "src-main-launcher-handlers-apps-apps-launcher-handler-module-scss__launch"
 };
 export default styles;

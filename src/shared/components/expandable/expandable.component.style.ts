@@ -1,4 +1,4 @@
 const styles = {
-    "button": "expandable-component-module__button___RbjME"
+    "button": "src-shared-components-expandable-expandable-component-module-scss__button"
 };
 export default styles;

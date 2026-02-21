@@ -1,9 +1,9 @@
 const styles = {
-    "container": "dictionary-launcher-handler-module__container___lelyW",
-    "top": "dictionary-launcher-handler-module__top___AS3iL",
-    "word": "dictionary-launcher-handler-module__word___DIEjI",
-    "partOfSpeech": "dictionary-launcher-handler-module__partOfSpeech___M40b6",
-    "definition": "dictionary-launcher-handler-module__definition___Kzet9",
-    "example": "dictionary-launcher-handler-module__example___Tkust"
+    "container": "src-main-launcher-handlers-dictionary-dictionary-launcher-handler-module-scss__container",
+    "top": "src-main-launcher-handlers-dictionary-dictionary-launcher-handler-module-scss__top",
+    "word": "src-main-launcher-handlers-dictionary-dictionary-launcher-handler-module-scss__word",
+    "partOfSpeech": "src-main-launcher-handlers-dictionary-dictionary-launcher-handler-module-scss__partOfSpeech",
+    "definition": "src-main-launcher-handlers-dictionary-dictionary-launcher-handler-module-scss__definition",
+    "example": "src-main-launcher-handlers-dictionary-dictionary-launcher-handler-module-scss__example"
 };
 export default styles;

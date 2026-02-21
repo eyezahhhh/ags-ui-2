@@ -1,4 +1,4 @@
 const styles = {
-    "percentLabel": "power-menu-handler-module__percentLabel___L13cc"
+    "percentLabel": "src-main-menu-handlers-power-power-menu-handler-module-scss__percentLabel"
 };
 export default styles;

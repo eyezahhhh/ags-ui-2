@@ -1,4 +1,4 @@
 const styles = {
-    "button": "network-bar-widget-module__button___7TRiE"
+    "button": "src-main-bar-widgets-network-network-bar-widget-module-scss__button"
 };
 export default styles;

@@ -1,5 +1,5 @@
 const styles = {
-    "engineName": "firefox-launcher-handler-module__engineName___If5XO",
-    "query": "firefox-launcher-handler-module__query___9Jaot"
+    "engineName": "src-main-launcher-handlers-firefox-firefox-launcher-handler-module-scss__engineName",
+    "query": "src-main-launcher-handlers-firefox-firefox-launcher-handler-module-scss__query"
 };
 export default styles;

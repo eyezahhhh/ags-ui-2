@@ -1,6 +1,6 @@
 const styles = {
-    "window": "slider-window-module__window___KOeHj",
-    "overlayContainer": "slider-window-module__overlayContainer___MOP8n",
-    "slider": "slider-window-module__slider___nXKaD"
+    "window": "src-shared-windows-slider-slider-window-module-scss__window",
+    "overlayContainer": "src-shared-windows-slider-slider-window-module-scss__overlayContainer",
+    "slider": "src-shared-windows-slider-slider-window-module-scss__slider"
 };
 export default styles;

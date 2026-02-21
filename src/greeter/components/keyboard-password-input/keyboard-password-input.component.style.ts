@@ -1,5 +1,5 @@
 const styles = {
-    "container": "keyboard-password-input-component-module__container___SA-0Q",
-    "entry": "keyboard-password-input-component-module__entry___--7Nn"
+    "container": "src-greeter-components-keyboard-password-input-keyboard-password-input-component-module-scss__container",
+    "entry": "src-greeter-components-keyboard-password-input-keyboard-password-input-component-module-scss__entry"
 };
 export default styles;

@@ -1,4 +1,4 @@
 const styles = {
-    "entry": "code-launcher-handler-module__entry___bIPq4"
+    "entry": "src-main-launcher-handlers-code-code-launcher-handler-module-scss__entry"
 };
 export default styles;

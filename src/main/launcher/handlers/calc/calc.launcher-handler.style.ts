@@ -1,6 +1,6 @@
 const styles = {
-    "container": "calc-launcher-handler-module__container___pF0YH",
-    "leftSide": "calc-launcher-handler-module__leftSide___mf0Wi",
-    "rightSide": "calc-launcher-handler-module__rightSide___A3bMe"
+    "container": "src-main-launcher-handlers-calc-calc-launcher-handler-module-scss__container",
+    "leftSide": "src-main-launcher-handlers-calc-calc-launcher-handler-module-scss__leftSide",
+    "rightSide": "src-main-launcher-handlers-calc-calc-launcher-handler-module-scss__rightSide"
 };
 export default styles;

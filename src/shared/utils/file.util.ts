@@ -19,8 +19,17 @@ export function getFileInfo(file: Gio.File) {
 	});
 }
 
+export function getFileInfoSync(file: Gio.File) {
+	return file.query_info("standard::type", Gio.FileQueryInfoFlags.NONE, null);
+}
+
 export async function getFileType(file: Gio.File) {
 	const info = await getFileInfo(file);
+	return info.get_file_type();
+}
+
+export function getFileTypeSync(file: Gio.File) {
+	const info = getFileInfoSync(file);
 	return info.get_file_type();
 }
 
@@ -44,6 +53,10 @@ export function makeDirectory(file: Gio.File) {
 	});
 }
 
+export function makeDirectorySync(file: Gio.File) {
+	file.make_directory(null);
+}
+
 export async function makeDirectoryRecursive(file: Gio.File) {
 	try {
 		await makeDirectory(file);
@@ -63,6 +76,32 @@ export async function makeDirectoryRecursive(file: Gio.File) {
 				}
 				await makeDirectoryRecursive(parent);
 				await makeDirectory(file);
+				return;
+			}
+		}
+		throw e;
+	}
+}
+
+export function makeDirectoryRecursiveSync(file: Gio.File) {
+	try {
+		makeDirectorySync(file);
+	} catch (e) {
+		if (e instanceof GLib.Error) {
+			if (e.matches(Gio.IOErrorEnum, Gio.IOErrorEnum.EXISTS)) {
+				const type = getFileTypeSync(file);
+				if (type == Gio.FileType.DIRECTORY) {
+					return;
+				}
+			}
+
+			if (e.matches(Gio.IOErrorEnum, Gio.IOErrorEnum.NOT_FOUND)) {
+				const parent = file.get_parent();
+				if (!parent) {
+					throw new Error("Root doesn't exist? What the fuck.");
+				}
+				makeDirectoryRecursiveSync(parent);
+				makeDirectorySync(file);
 				return;
 			}
 		}

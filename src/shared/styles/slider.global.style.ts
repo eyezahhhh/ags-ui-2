@@ -1,4 +1,4 @@
 const styles = {
-    "slider": "slider-global-module__slider___wAkW8"
+    "slider": "src-shared-styles-slider-global-module-scss__slider"
 };
 export default styles;

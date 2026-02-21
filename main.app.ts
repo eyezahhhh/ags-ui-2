@@ -16,6 +16,8 @@ import { createCommandProcess } from "@util/cli";
 import { CACHE_DIRECTORY } from "@const/cache-directory";
 import { WALLUST_FILE } from "@const/wallust-file";
 import { generateStylesSync } from "@util/app";
+import { makeDirectoryRecursiveSync } from "@util/file";
+import Gio from "gi://Gio?version=2.0";
 
 console.log(`ROOT:`, ROOT);
 
@@ -25,13 +27,15 @@ const reloadStyles = createDebouncer(() => {
 	console.log("Reloaded CSS.");
 }, 100);
 
+makeDirectoryRecursiveSync(Gio.File.new_for_path(CACHE_DIRECTORY));
+generateStylesSync();
+
 app.start({
+	css: `${CACHE_DIRECTORY}/style.css`,
 	// iconTheme: "Papirus",
 	instanceName: `${CLASS}_main`,
 	iconTheme: "Papirus",
 	main: () => {
-		generateStylesSync();
-
 		const monitorWindows = new Map<Gdk.Monitor, Gtk.Window[]>();
 
 		const activateMonitors = () => {
@@ -84,6 +88,8 @@ app.start({
 					WALLUST_FILE,
 					"--wallust-cache-file",
 					`${CACHE_DIRECTORY}/wallust.scss`,
+					"--root",
+					ROOT,
 					"--watch",
 				],
 				{

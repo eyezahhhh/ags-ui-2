@@ -1,5 +1,5 @@
 const styles = {
-    "window": "menu-window-module__window___usviS",
-    "container": "menu-window-module__container___HlsvE"
+    "window": "src-main-menu-menu-window-module-scss__window",
+    "container": "src-main-menu-menu-window-module-scss__container"
 };
 export default styles;

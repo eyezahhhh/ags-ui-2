@@ -1,4 +1,4 @@
 const styles = {
-    "button": "brightness-bar-widget-module__button___8f2l9"
+    "button": "src-main-bar-widgets-brightness-brightness-bar-widget-module-scss__button"
 };
 export default styles;

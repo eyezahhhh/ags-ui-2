@@ -1,6 +1,6 @@
 const styles = {
-    "button": "wireguard-connection-component-module__button___F851L",
-    "label": "wireguard-connection-component-module__label___M-ze3",
-    "subLabel": "wireguard-connection-component-module__subLabel___8GHJr"
+    "button": "src-shared-components-wireguard-connection-wireguard-connection-component-module-scss__button",
+    "label": "src-shared-components-wireguard-connection-wireguard-connection-component-module-scss__label",
+    "subLabel": "src-shared-components-wireguard-connection-wireguard-connection-component-module-scss__subLabel"
 };
 export default styles;

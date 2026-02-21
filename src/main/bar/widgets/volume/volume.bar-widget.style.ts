@@ -1,5 +1,5 @@
 const styles = {
-    "button": "volume-bar-widget-module__button___zKLen",
-    "label": "volume-bar-widget-module__label___yjzJX"
+    "button": "src-main-bar-widgets-volume-volume-bar-widget-module-scss__button",
+    "label": "src-main-bar-widgets-volume-volume-bar-widget-module-scss__label"
 };
 export default styles;

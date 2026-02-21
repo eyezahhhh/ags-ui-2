@@ -1,5 +1,5 @@
 const styles = {
-    "sliderSection": "display-menu-handler-module__sliderSection___NrztM",
-    "sliderName": "display-menu-handler-module__sliderName___RMMVA"
+    "sliderSection": "src-main-menu-handlers-display-display-menu-handler-module-scss__sliderSection",
+    "sliderName": "src-main-menu-handlers-display-display-menu-handler-module-scss__sliderName"
 };
 export default styles;

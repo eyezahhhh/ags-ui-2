@@ -1,6 +1,6 @@
 const styles = {
-    "paddingContainer": "group-component-module__paddingContainer___6b0vW",
-    "container": "group-component-module__container___4qekT",
-    "button": "group-component-module__button___4baLG"
+    "paddingContainer": "src-greeter-components-group-group-component-module-scss__paddingContainer",
+    "container": "src-greeter-components-group-group-component-module-scss__container",
+    "button": "src-greeter-components-group-group-component-module-scss__button"
 };
 export default styles;

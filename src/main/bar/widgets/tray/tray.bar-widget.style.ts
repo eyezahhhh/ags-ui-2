@@ -1,4 +1,4 @@
 const styles = {
-    "button": "tray-bar-widget-module__button___ceIX2"
+    "button": "src-main-bar-widgets-tray-tray-bar-widget-module-scss__button"
 };
 export default styles;

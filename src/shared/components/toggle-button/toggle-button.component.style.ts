@@ -1,5 +1,5 @@
 const styles = {
-    "active": "toggle-button-component-module__active___QxdH1",
-    "disabled": "toggle-button-component-module__disabled___F5Uq0"
+    "active": "src-shared-components-toggle-button-toggle-button-component-module-scss__active",
+    "disabled": "src-shared-components-toggle-button-toggle-button-component-module-scss__disabled"
 };
 export default styles;

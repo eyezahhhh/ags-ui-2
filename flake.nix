@@ -35,7 +35,9 @@
       ############################################################
 
       lib = {
-        mkEyezahUI = system: { instanceId ? "eyezah-ui" }:
+        mkEyezahUI = system: { instanceId ? "eyezah-ui"
+                             , homeDirectory ? "/home/eyezah" # for debugging
+                             }:
           let
             pkgs = nixpkgs.legacyPackages.${system};
 
@@ -65,15 +67,17 @@
                 pkgs.glib-networking
               ];
           in
-          pkgs.stdenv.mkDerivation {
+          pkgs.buildNpmPackage {
             name = pname;
             src = ./.;
+            dontNpmBuild = true;
+            npmDepsHash = "sha256-5L+u1IJ6GkdEQEVqo5IKPVw5XlNrO+f7D+pq2ArYOhY=";
 
             nativeBuildInputs = [
               pkgs.wrapGAppsHook4
               pkgs.gobject-introspection
               ags.packages.${system}.default
-              pkgs.nodejs_24
+              pkgs.jq
             ];
 
             buildInputs = extraPackages ++ [
@@ -81,20 +85,21 @@
               pkgs.nodejs_24
             ];
 
-            buildPhase = ''
-              runHook preBuild
+            postPatch = ''
+              # Remove from package.json
+              ${pkgs.lib.getExe pkgs.jq} 'del(.dependencies.ags, .dependencies.gnim, .devDependencies.ags, .devDependencies.gnim)' package.json > package.json.tmp && mv package.json.tmp package.json
 
-              echo "Current directory:"
-              pwd
-              ls -la
-
-              npm ci --omit=dev
-
-              runHook postBuild
+              # Remove from the root dependencies and the node_modules entry in the lockfile
+              ${pkgs.lib.getExe pkgs.jq} 'del(.packages."".dependencies.ags, .packages."".dependencies.gnim, .packages."node_modules/ags", .packages."node_modules/gnim")' package-lock.json > package-lock.json.tmp && mv package-lock.json.tmp package-lock.json
             '';
 
             installPhase = ''
               runHook preInstall
+
+              export HOME="${homeDirectory}"
+
+              node script/generate-wallust-file.js --instance "${instanceId}"
+              node script/generate-styles.js --output-file "/dev/null"
 
               mkdir -p $out/bin
               mkdir -p $out/share
@@ -180,14 +185,19 @@
               default = "eyezah-ui";
               description = "Astal instance ID used during build.";
             };
+
+            package = lib.mkOption {
+              type = lib.types.package;
+              default = (self.lib.mkEyezahUI pkgs.system {
+                instanceId = cfg.instanceId;
+                homeDirectory = config.home.homeDirectory;
+              });
+              description = "The final eyezah-ui package derivation.";
+            };
           };
 
           config = lib.mkIf cfg.enable {
-            home.packages = [
-              (self.lib.mkEyezahUI pkgs.system {
-                instanceId = cfg.instanceId;
-              })
-            ];
+            home.packages = [ cfg.package ];
           };
         };
     };

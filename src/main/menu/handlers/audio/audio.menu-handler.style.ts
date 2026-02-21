@@ -1,4 +1,4 @@
 const styles = {
-    "topContainer": "audio-menu-handler-module__topContainer___N0-il"
+    "topContainer": "src-main-menu-handlers-audio-audio-menu-handler-module-scss__topContainer"
 };
 export default styles;
