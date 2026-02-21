@@ -98,8 +98,9 @@
 
               export HOME="${homeDirectory}"
 
-              node script/generate-wallust-file.js --instance "${instanceId}"
+              node script/generate-wallust-file.js --dummy
               node script/generate-styles.js --output-file "/dev/null"
+              node script/generate-wallust-file.js --instance "${instanceId}"
 
               mkdir -p $out/bin
               mkdir -p $out/share

@@ -65,7 +65,6 @@ const root = getFlag("--root") || path.resolve(__dirname, "..");
 const getPlugins = (tsFileName) => [
 	postcssModules({
 		root,
-		// generateScopedName: "[path][name]__[local]___[hash:base64:5]",
 		generateScopedName: (name, filename) => {
 			const relativePath = path.relative(root, filename);
 			const cleanPath = relativePath.replace(/\//g, "-").replace(/\./g, "-");
