@@ -78,6 +78,7 @@
               pkgs.gobject-introspection
               ags.packages.${system}.default
               pkgs.jq
+              pkgs.makeWrapper
             ];
 
             buildInputs = extraPackages ++ [
@@ -114,6 +115,11 @@
                 -d "INSTANCE_ID='${instanceId}'"
 
               runHook postInstall
+            '';
+
+            postFixup = ''
+              wrapProgram $out/bin/${pname} \
+                --prefix PATH : ${pkgs.lib.makeBinPath [ pkgs.nodejs_24 ]}
             '';
           };
       };
