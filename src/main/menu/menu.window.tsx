@@ -1,4 +1,4 @@
-import { Astal } from "ags/gtk4";
+import { Astal, Gtk } from "ags/gtk4";
 import app from "ags/gtk4/app";
 import styles from "./menu.window.style";
 import { getActiveHandlerStateAccessor, MENU_HANDLERS } from "./menu.manager";
@@ -29,9 +29,8 @@ export function MenuWindow() {
 	});
 
 	const computedBind = createComputed(
-		[handler, stateAccessor],
-		(handler, stateAccessor) =>
-			[handler, stateAccessor.handler && stateAccessor.data] as [
+		() =>
+			[handler(), stateAccessor().handler] as [
 				MenuHandler | null,
 				string | number | null,
 			],
@@ -52,7 +51,7 @@ export function MenuWindow() {
 		>
 			<With value={computedBind}>
 				{([handler, data]) => (
-					<box cssClasses={[styles.container]}>
+					<box cssClasses={[styles.container]} valign={Gtk.Align.START}>
 						{handler?.getContent(window, data)}
 					</box>
 				)}
