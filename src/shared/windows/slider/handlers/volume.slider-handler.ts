@@ -11,11 +11,17 @@ export class VolumeSliderHandler extends SliderHandler {
 		super(wp.defaultSpeaker.volume * 100);
 		this.wp = wp;
 
+		let hasntUpdated = true;
+
 		let speakerDestroyer: Destroyer | null = null;
 		const connectSpeaker = () => {
 			speakerDestroyer?.destroy();
 			speakerDestroyer = new Destroyer();
-			this.update(wp.defaultSpeaker.volume * 100);
+			if (!hasntUpdated) {
+				this.update(wp.defaultSpeaker.volume * 100);
+			}
+			hasntUpdated = false;
+
 			speakerDestroyer.addDisconnect(
 				wp,
 				wp.defaultSpeaker.connect("notify::volume", () => {

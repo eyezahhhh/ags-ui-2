@@ -1,4 +1,4 @@
-import { Astal, Gtk } from "ags/gtk4";
+import { Astal, Gdk, Gtk } from "ags/gtk4";
 import app from "ags/gtk4/app";
 import { CLASS } from "constants/class.const";
 import styles from "./launcher.window.style";
@@ -199,6 +199,13 @@ export function LauncherWindow() {
 				});
 			}}
 		>
+			<Gtk.EventControllerKey
+				onKeyPressed={(_self, keyVal) => {
+					if (keyVal == Gdk.KEY_Escape) {
+						window.visible = false;
+					}
+				}}
+			/>
 			<box
 				cssClasses={[styles.container]}
 				orientation={Gtk.Orientation.VERTICAL}
@@ -308,7 +315,11 @@ export function LauncherWindow() {
 						</box>
 					</box>
 
-					<Gtk.ScrolledWindow widthRequest={400} vexpand>
+					<Gtk.ScrolledWindow
+						widthRequest={400}
+						vexpand
+						cssClasses={[styles.content]}
+					>
 						<box>
 							<With value={activeEntry}>
 								{(activeEntry) =>

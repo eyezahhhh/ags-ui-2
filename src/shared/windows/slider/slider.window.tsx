@@ -7,9 +7,13 @@ import { Destroyer } from "@util/destroyer";
 import { createState, onCleanup, With } from "gnim";
 import styles from "./slider.window.style";
 import { createCursorPointer } from "@util/ags";
+import { DisplayBrightnessSliderHandler } from "./handlers/display-brightness.slider-handler";
 
 export function SliderWindow() {
-	const handlers: SliderHandler[] = [new VolumeSliderHandler()];
+	const handlers: SliderHandler[] = [
+		new VolumeSliderHandler(),
+		new DisplayBrightnessSliderHandler(),
+	];
 	const [activeHandler, setActiveHandler] = createState<{
 		handler: SliderHandler;
 		percent: number;

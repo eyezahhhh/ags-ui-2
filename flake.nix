@@ -166,6 +166,10 @@
         in
         {
           default = pkgs.mkShell {
+            nativeBuildInputs = [
+              pkgs.nodejs_24
+            ];
+
             buildInputs = [
               (ags.packages.${system}.default.override {
                 inherit extraPackages;

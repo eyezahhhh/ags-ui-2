@@ -5,6 +5,7 @@ import postcss from "postcss";
 import postcssModules from "postcss-modules";
 import Watcher from "watcher";
 import { fileURLToPath } from "node:url";
+import { createHash } from "node:crypto";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -69,8 +70,8 @@ const getPlugins = (tsFileName) => [
 			const relativePath = path.relative(root, filename);
 			const cleanPath = relativePath.replace(/\//g, "-").replace(/\./g, "-");
 
-			const scopedName = `${cleanPath}__${name}`;
-			console.log(scopedName);
+			const hash = createHash("sha1").update(relativePath).digest("hex");
+			const scopedName = `${cleanPath}__${name}__${hash.substring(0, 10)}`;
 			return scopedName;
 		},
 		getJSON: noTsOutput
@@ -141,7 +142,7 @@ async function buildAll(outputFile, wallustFile, wallustCacheFile) {
 
 	for (const file of files) {
 		if (file.endsWith(".module.scss")) {
-			console.log(file);
+			// console.log(file);
 			const css = await processFile(file);
 			globalCss += css + "\n";
 		} else if (file.endsWith(".style.ts")) {
