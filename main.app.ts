@@ -15,7 +15,7 @@ import { IS_DEV } from "@const/is-dev";
 import { createCommandProcess } from "@util/cli";
 import { CACHE_DIRECTORY } from "@const/cache-directory";
 import { WALLUST_FILE } from "@const/wallust-file";
-import { generateStylesSync } from "@util/app";
+import { generateStyles, generateStylesSync } from "@util/app";
 import { makeDirectoryRecursiveSync } from "@util/file";
 import Gio from "gi://Gio?version=2.0";
 
@@ -73,6 +73,10 @@ app.start({
 		SliderWindow();
 
 		monitorFile(`${CACHE_DIRECTORY}/style.css`, () => reloadStyles());
+		monitorFile(WALLUST_FILE, () => {
+			console.log(`Wallust file changed (${WALLUST_FILE})`);
+			generateStyles().catch(console.error);
+		});
 
 		WireGuard.get_default(); // load WireGuard before it's visually needed
 

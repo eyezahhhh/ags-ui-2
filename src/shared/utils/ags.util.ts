@@ -15,7 +15,7 @@ export function optionalAs<T, V>(
 
 export function getOptional<T>(value: T | Accessor<T>) {
 	if (value instanceof Accessor) {
-		return value.get();
+		return value.peek();
 	}
 	return value;
 }
