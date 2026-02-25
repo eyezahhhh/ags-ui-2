@@ -30,7 +30,7 @@ export function BatteryBarWidget({ onClicked }: Props) {
 					iconName={createComputed(
 						[
 							createBinding(battery, "device_type"),
-							createBinding(battery, "battery_icon_name"),
+							createBinding(battery, "icon_name"),
 						],
 						(type, icon) =>
 							type == AstalBattery.Type.UNKNOWN

@@ -1,7 +1,7 @@
 import GObject from "gnim/gobject";
 import { MenuHandler } from "../menu-handler";
 import AstalBattery from "gi://AstalBattery?version=0.1";
-import { Accessor, createBinding, createComputed, With } from "gnim";
+import { Accessor, createBinding, With } from "gnim";
 import { formatTime } from "@util/string";
 import { Gtk } from "ags/gtk4";
 import styles from "./power.menu-handler.style";
@@ -32,7 +32,7 @@ export class PowerMenuHandler extends MenuHandler {
 								<box orientation={Gtk.Orientation.VERTICAL} hexpand>
 									<box>
 										<image
-											iconName={createBinding(battery, "battery_icon_name")}
+											iconName={createBinding(battery, "icon_name")}
 											iconSize={Gtk.IconSize.LARGE}
 										/>
 										<label
