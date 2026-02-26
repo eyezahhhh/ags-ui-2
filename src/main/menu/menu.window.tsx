@@ -45,8 +45,8 @@ export function MenuWindow() {
 			cssClasses={[styles.window]}
 			visible={handler.as((handler) => !!handler)}
 			name="menu"
-			class={`${CLASS}_menu`}
-			namespace={CLASS}
+			namespace={`${CLASS}_menu`}
+			class={CLASS}
 			keymode={Astal.Keymode.ON_DEMAND}
 		>
 			<With value={computedBind}>

@@ -37,6 +37,25 @@ export function BatteryBarWidget({ onClicked }: Props) {
 								? "gnome-power-manager-symbolic"
 								: icon,
 					)}
+					cssClasses={createComputed(
+						[
+							createBinding(battery, "percentage"),
+							createBinding(battery, "charging"),
+						],
+						(percent, charging) => {
+							const classes: string[] = [styles.icon];
+							if (percent <= 0.2) {
+								classes.push(styles["percent-danger"]);
+							}
+							if (percent <= 0.3) {
+								classes.push(styles["percent-warning"]);
+							}
+							if (charging) {
+								classes.push(styles["charging"]);
+							}
+							return classes;
+						},
+					)}
 				/>
 				<revealer
 					transitionType={Gtk.RevealerTransitionType.SLIDE_RIGHT}
@@ -48,7 +67,7 @@ export function BatteryBarWidget({ onClicked }: Props) {
 					<label
 						cssClasses={[styles.label]}
 						label={createBinding(battery, "percentage").as(
-							(percent) => `${percent * 100}%`,
+							(percent) => `${Math.round(percent * 100)}%`,
 						)}
 					/>
 				</revealer>

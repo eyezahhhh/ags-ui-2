@@ -1,24 +1,65 @@
+import { CACHE_DIRECTORY } from "@const/cache-directory";
 import { CLASS } from "@const/class";
+import { IS_DEV } from "@const/is-dev";
 import { ROOT } from "@const/root";
+import { WALLUST_FILE } from "@const/wallust-file";
+import { generateStyles, generateStylesSync } from "@util/app";
+import { createCommandProcess } from "@util/cli";
+import { makeDirectoryRecursiveSync } from "@util/file";
 import { createDebouncer } from "@util/time";
 import { monitorFile } from "ags/file";
 import app from "ags/gtk4/app";
+import Gio from "gi://Gio";
 import { GreeterWindow } from "greeter/greeter.window";
 
 const reloadStyles = createDebouncer(() => {
 	app.reset_css();
-	app.apply_css(`${ROOT}/astal-style.css`);
+	app.apply_css(`${CACHE_DIRECTORY}/style.css`);
 	console.log("Reloaded CSS.");
 }, 100);
 
 app.start({
-	css: `${ROOT}/astal-style.css`,
+	css: `${CACHE_DIRECTORY}/style.css`,
 	instanceName: `${CLASS}_greeter`,
 	iconTheme: "Papirus",
 	main: () => {
+		makeDirectoryRecursiveSync(Gio.File.new_for_path(CACHE_DIRECTORY));
+		generateStylesSync(IS_DEV);
+
 		const monitors = app.get_monitors();
 		GreeterWindow(monitors[monitors.length - 1]);
 
-		monitorFile(`${ROOT}/astal-style.css`, () => reloadStyles());
+		monitorFile(`${CACHE_DIRECTORY}/style.css`, () => reloadStyles());
+		monitorFile(WALLUST_FILE, () => {
+			console.log(`Wallust file changed (${WALLUST_FILE})`);
+			generateStyles().catch(console.error);
+		});
+
+		if (IS_DEV) {
+			console.log("Launched in DEV mode, watching .scss files");
+			createCommandProcess(
+				[
+					"node",
+					`${ROOT}/script/generate-styles.js`,
+					"--output-file",
+					`${CACHE_DIRECTORY}/style.css`,
+					"--wallust-file",
+					WALLUST_FILE,
+					"--wallust-cache-file",
+					`${CACHE_DIRECTORY}/wallust.scss`,
+					"--root",
+					ROOT,
+					"--watch",
+				],
+				{
+					onStdout: (stdout) => {
+						console.log("[SCSS MONITOR]:", stdout);
+					},
+					onStderr: (stderr) => {
+						console.error("[SCSS MONITOR]:", stderr);
+					},
+				},
+			);
+		}
 	},
 });

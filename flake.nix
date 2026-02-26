@@ -65,6 +65,7 @@
                 pkgs.libadwaita
                 pkgs.libsoup_3
                 pkgs.glib-networking
+                pkgs.accountsservice
               ];
           in
           pkgs.buildNpmPackage {
@@ -162,6 +163,7 @@
               pkgs.libsoup_3
               pkgs.glib-networking
               pkgs.nodejs_24
+              pkgs.accountsservice
             ];
         in
         {

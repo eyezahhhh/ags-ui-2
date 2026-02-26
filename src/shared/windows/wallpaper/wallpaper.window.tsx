@@ -12,11 +12,11 @@ export function WallpaperWindow(gdkMonitor: Gdk.Monitor) {
 	return (
 		<window
 			name="wallpaper"
-			class={`${CLASS}_wallpaper`}
+			namespace={`${CLASS}_wallpaper`}
 			anchor={TOP | BOTTOM | LEFT | RIGHT}
 			gdkmonitor={gdkMonitor}
 			application={app}
-			namespace={CLASS}
+			class={CLASS}
 			layer={Astal.Layer.BACKGROUND}
 			visible
 		>

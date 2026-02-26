@@ -12,10 +12,9 @@ import { WallpaperWindow } from "@window/wallpaper/wallpaper";
 import { SliderWindow } from "@window/slider/slider";
 import { createBinding } from "gnim";
 import { IS_DEV } from "@const/is-dev";
-import { createCommandProcess } from "@util/cli";
 import { CACHE_DIRECTORY } from "@const/cache-directory";
 import { WALLUST_FILE } from "@const/wallust-file";
-import { generateStyles, generateStylesSync } from "@util/app";
+import { generateStyles, generateStylesSync, watchStyles } from "@util/app";
 import { makeDirectoryRecursiveSync } from "@util/file";
 import Gio from "gi://Gio?version=2.0";
 
@@ -27,15 +26,14 @@ const reloadStyles = createDebouncer(() => {
 	console.log("Reloaded CSS.");
 }, 100);
 
-makeDirectoryRecursiveSync(Gio.File.new_for_path(CACHE_DIRECTORY));
-generateStylesSync();
-
 app.start({
 	css: `${CACHE_DIRECTORY}/style.css`,
-	// iconTheme: "Papirus",
 	instanceName: `${CLASS}_main`,
 	iconTheme: "Papirus",
 	main: () => {
+		makeDirectoryRecursiveSync(Gio.File.new_for_path(CACHE_DIRECTORY));
+		generateStylesSync(IS_DEV);
+
 		const monitorWindows = new Map<Gdk.Monitor, Gtk.Window[]>();
 
 		const activateMonitors = () => {
@@ -82,29 +80,14 @@ app.start({
 
 		if (IS_DEV) {
 			console.log("Launched in DEV mode, watching .scss files");
-			createCommandProcess(
-				[
-					"node",
-					`${ROOT}/script/generate-styles.js`,
-					"--output-file",
-					`${CACHE_DIRECTORY}/style.css`,
-					"--wallust-file",
-					WALLUST_FILE,
-					"--wallust-cache-file",
-					`${CACHE_DIRECTORY}/wallust.scss`,
-					"--root",
-					ROOT,
-					"--watch",
-				],
-				{
-					onStdout: (stdout) => {
-						console.log("[SCSS MONITOR]:", stdout);
-					},
-					onStderr: (stderr) => {
-						console.error("[SCSS MONITOR]:", stderr);
-					},
+			watchStyles({
+				onStdout: (stdout) => {
+					console.log("[SCSS MONITOR]:", stdout);
 				},
-			);
+				onStderr: (stderr) => {
+					console.error("[SCSS MONITOR]:", stderr);
+				},
+			});
 		}
 	},
 	requestHandler: (args, respond) => {

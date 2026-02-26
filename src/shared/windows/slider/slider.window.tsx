@@ -59,10 +59,10 @@ export function SliderWindow() {
 	return (
 		<window
 			name="slider"
-			class={`${CLASS}_slider`}
+			namespace={`${CLASS}_slider`}
 			anchor={Astal.WindowAnchor.BOTTOM}
 			application={app}
-			namespace={CLASS}
+			class={CLASS}
 			marginBottom={200}
 			cssClasses={[styles.window]}
 			visible={activeHandler.as((handler) => !!handler?.visible)}

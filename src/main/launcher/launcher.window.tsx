@@ -181,11 +181,11 @@ export function LauncherWindow() {
 		<window
 			visible={false}
 			name="launcher"
-			class={`${CLASS}_launcher`}
+			class={CLASS}
 			exclusivity={Astal.Exclusivity.EXCLUSIVE}
 			keymode={Astal.Keymode.ON_DEMAND}
 			application={app}
-			namespace={CLASS}
+			namespace={`${CLASS}_launcher`}
 			cssClasses={[styles.window]}
 			// anchor={TOP | RIGHT}
 			$={(self) => {

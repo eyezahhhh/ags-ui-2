@@ -113,12 +113,12 @@ export function GreeterWindow(gdkMonitor: Gdk.Monitor) {
 		<window
 			visible
 			name="greeter"
-			class={`${CLASS}_greeter`}
+			namespace={`${CLASS}_greeter`}
 			gdkmonitor={gdkMonitor}
 			cssClasses={[styles.window]}
-			anchor={TOP | LEFT}
+			anchor={TOP | RIGHT}
 			application={app}
-			namespace={CLASS}
+			class={CLASS}
 			keymode={Astal.Keymode.ON_DEMAND}
 			$={(self) => {
 				window = self;

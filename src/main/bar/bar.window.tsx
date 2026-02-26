@@ -49,13 +49,13 @@ export function BarWindow(gdkMonitor: Gdk.Monitor) {
 		<window
 			visible
 			name="bar"
-			class={`${CLASS}_bar`}
+			namespace={`${CLASS}_bar`}
 			gdkmonitor={gdkMonitor}
 			cssClasses={[styles.window]}
 			exclusivity={Astal.Exclusivity.EXCLUSIVE}
 			anchor={TOP | LEFT | RIGHT}
 			application={app}
-			namespace={CLASS}
+			class={CLASS}
 		>
 			<box cssClasses={[styles.container]}>
 				<centerbox hexpand>
