@@ -2,7 +2,14 @@ import { CLASS } from "@const/class";
 import { Astal, Gdk, Gtk } from "ags/gtk4";
 import styles from "./greeter.window.style";
 import app from "ags/gtk4/app";
-import { Accessor, createComputed, createState, onCleanup, With } from "gnim";
+import {
+	Accessor,
+	createBinding,
+	createComputed,
+	createState,
+	onCleanup,
+	With,
+} from "gnim";
 import Gamepad from "@service/gamepad";
 import { Destroyer } from "@util/destroyer";
 import {
@@ -15,8 +22,12 @@ import { SessionSelector } from "./components/session-selector/session-selector.
 import { PowerButtonGroup } from "./components/power-button-group/power-button-group.component";
 import { KeyboardPasswordInput } from "./components/keyboard-password-input/keyboard-password-input.component";
 import { LoginSection } from "./components/login-section/login-section.component";
+import Wallpaper from "@service/wallpaper";
 
-const SESSION_DIRECTORIES = ["./example-desktop-sessions"];
+// const SESSION_DIRECTORIES = ["./example-desktop-sessions"];
+const SESSION_DIRECTORIES = [
+	"/nix/store/qfsdwig2cy6zsc0920674h75kmd68kvg-custom-sessions-bundle/share/wayland-sessions",
+];
 
 export function GreeterWindow(gdkMonitor: Gdk.Monitor) {
 	const { TOP, BOTTOM, LEFT, RIGHT } = Astal.WindowAnchor;
@@ -26,6 +37,7 @@ export function GreeterWindow(gdkMonitor: Gdk.Monitor) {
 	const gamepad = Gamepad.get_default();
 	const destroyer = new Destroyer();
 	let window: Gtk.Window | null = null;
+	const wallpaperService = Wallpaper.get_default();
 
 	getDesktopSessions(SESSION_DIRECTORIES)
 		.then(setSessions)
@@ -169,7 +181,36 @@ export function GreeterWindow(gdkMonitor: Gdk.Monitor) {
 						);
 					}}
 				>
-					<box cssClasses={[styles.background]} hexpand vexpand></box>
+					<revealer
+						cssClasses={[styles.background]}
+						hexpand
+						vexpand
+						transitionType={Gtk.RevealerTransitionType.CROSSFADE}
+						revealChild={createComputed(
+							() =>
+								createBinding(wallpaperService, "is_current_set")() &&
+								!createBinding(wallpaperService, "is_loading_colors")(),
+						)}
+						child={createComputed(() => {
+							if (!createBinding(wallpaperService, "is_current_set")()) {
+								return (<box />) as Gtk.Widget;
+							}
+							const picture = Gtk.Picture.new_for_filename(
+								createBinding(wallpaperService, "current")().getPath(),
+							);
+							picture.set_content_fit(Gtk.ContentFit.COVER);
+							return picture;
+						})}
+						// child={createBinding(wallpaperService, "current").as(
+						// 	(current) => {
+						// 		const picture = Gtk.Picture.new_for_filename(
+						// 			current.getPath(),
+						// 		);
+						// 		picture.set_content_fit(Gtk.ContentFit.COVER);
+						// 		return picture;
+						// 	},
+						// )}
+					/>
 				</Gtk.Overlay>
 			</box>
 		</window>

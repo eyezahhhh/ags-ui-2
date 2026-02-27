@@ -1,6 +1,6 @@
 import Gamepad from "@service/gamepad";
 import { Destroyer } from "@util/destroyer";
-import { Gtk } from "ags/gtk4";
+import { Gdk, Gtk } from "ags/gtk4";
 import { Accessor, createComputed, createState, For, onCleanup } from "gnim";
 import styles from "./group.component.style";
 import { asAccessor, createCursorPointer } from "@util/ags";
@@ -62,7 +62,23 @@ export function Group({
 				$={(self) => {
 					container = self;
 				}}
+				onClicked={(self) => {
+					const focusedButtonIndex = focusedButton();
+					if (focusedButtonIndex >= 0) {
+						onClicked?.(focusedButtonIndex);
+					} else if (self.has_focus) {
+						setFocusedButton(0);
+					}
+				}}
 			>
+				<Gtk.EventControllerKey
+					onKeyPressed={(_self, keyVal) => {
+						if (keyVal == Gdk.KEY_Escape) {
+							setFocusedButton(-1);
+							container?.grab_focus();
+						}
+					}}
+				/>
 				<Gtk.EventControllerFocus
 					onEnter={(self) => {
 						const destroyer = new Destroyer();
@@ -72,7 +88,7 @@ export function Group({
 								(_gamepad, button, buttonIndex) => {
 									if (button.value == 1) {
 										if (buttonIndex == 0) {
-											const focusedButtonIndex = focusedButton.get();
+											const focusedButtonIndex = focusedButton();
 											if (focusedButtonIndex >= 0) {
 												onClicked?.(focusedButtonIndex);
 											} else if (container?.has_focus) {
