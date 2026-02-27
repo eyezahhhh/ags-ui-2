@@ -22,7 +22,8 @@ import { SessionSelector } from "./components/session-selector/session-selector.
 import { PowerButtonGroup } from "./components/power-button-group/power-button-group.component";
 import { KeyboardPasswordInput } from "./components/keyboard-password-input/keyboard-password-input.component";
 import { LoginSection } from "./components/login-section/login-section.component";
-import Wallpaper from "@service/wallpaper";
+import { IS_DEV } from "@const/is-dev";
+// import Wallpaper from "@service/wallpaper";
 
 // const SESSION_DIRECTORIES = ["./example-desktop-sessions"];
 const SESSION_DIRECTORIES = [
@@ -37,7 +38,7 @@ export function GreeterWindow(gdkMonitor: Gdk.Monitor) {
 	const gamepad = Gamepad.get_default();
 	const destroyer = new Destroyer();
 	let window: Gtk.Window | null = null;
-	const wallpaperService = Wallpaper.get_default();
+	// const wallpaperService = Wallpaper.get_default();
 
 	getDesktopSessions(SESSION_DIRECTORIES)
 		.then(setSessions)
@@ -131,7 +132,7 @@ export function GreeterWindow(gdkMonitor: Gdk.Monitor) {
 			anchor={TOP | RIGHT}
 			application={app}
 			class={CLASS}
-			keymode={Astal.Keymode.ON_DEMAND}
+			keymode={IS_DEV ? Astal.Keymode.ON_DEMAND : Astal.Keymode.EXCLUSIVE}
 			$={(self) => {
 				window = self;
 			}}
@@ -181,7 +182,8 @@ export function GreeterWindow(gdkMonitor: Gdk.Monitor) {
 						);
 					}}
 				>
-					<revealer
+					<box hexpand vexpand />
+					{/* <revealer
 						cssClasses={[styles.background]}
 						hexpand
 						vexpand
@@ -210,7 +212,7 @@ export function GreeterWindow(gdkMonitor: Gdk.Monitor) {
 						// 		return picture;
 						// 	},
 						// )}
-					/>
+					/> */}
 				</Gtk.Overlay>
 			</box>
 		</window>
