@@ -36,7 +36,10 @@
 
       lib = {
         mkEyezahUI = system: { instanceId ? "eyezah-ui"
-                             , homeDirectory ? "/home/eyezah" # for debugging
+                             , homeDirectory ? "/home/eyezah"
+                             , enableShell ? true
+                             , enableGreeter ? false
+                             , sessionsDir ? "/usr/share/wayland-sessions"
                              }:
           let
             pkgs = nixpkgs.legacyPackages.${system};
@@ -60,8 +63,7 @@
             ];
 
             extraPackages =
-              astalPackages
-              ++ [
+              astalPackages ++ [
                 pkgs.libadwaita
                 pkgs.libsoup_3
                 pkgs.glib-networking
@@ -88,11 +90,16 @@
             ];
 
             postPatch = ''
-              # Remove from package.json
-              ${pkgs.lib.getExe pkgs.jq} 'del(.dependencies.ags, .dependencies.gnim, .devDependencies.ags, .devDependencies.gnim)' package.json > package.json.tmp && mv package.json.tmp package.json
+              ${pkgs.lib.getExe pkgs.jq} \
+                'del(.dependencies.ags, .dependencies.gnim, .devDependencies.ags, .devDependencies.gnim)' \
+                package.json > package.json.tmp && mv package.json.tmp package.json
 
-              # Remove from the root dependencies and the node_modules entry in the lockfile
-              ${pkgs.lib.getExe pkgs.jq} 'del(.packages."".dependencies.ags, .packages."".dependencies.gnim, .packages."node_modules/ags", .packages."node_modules/gnim")' package-lock.json > package-lock.json.tmp && mv package-lock.json.tmp package-lock.json
+              ${pkgs.lib.getExe pkgs.jq} \
+                'del(.packages."".dependencies.ags,
+                     .packages."".dependencies.gnim,
+                     .packages."node_modules/ags",
+                     .packages."node_modules/gnim")' \
+                package-lock.json > package-lock.json.tmp && mv package-lock.json.tmp package-lock.json
             '';
 
             installPhase = ''
@@ -107,20 +114,37 @@
               mkdir -p $out/bin
               mkdir -p $out/share
               cp -r * $out/share
+            ''
+            + pkgs.lib.optionalString enableShell ''
+              echo "Bundling shell..."
 
               ags bundle main.app.ts \
-                $out/bin/${pname} \
+                $out/bin/${pname}-shell \
                 --root . \
                 --gtk 4 \
                 -d "SRC='$out/share'" \
                 -d "INSTANCE_ID='${instanceId}'"
+            ''
+            + pkgs.lib.optionalString enableGreeter ''
+              echo "Bundling greeter..."
 
+              ags bundle greeter.app.ts \
+                $out/bin/${pname}-greeter \
+                --root . \
+                --gtk 4 \
+                -d "SRC='$out/share'" \
+                -d "INSTANCE_ID='${instanceId}'" \
+                -d "SESSIONS_DIR='${sessionsDir}'"
+            ''
+            + ''
               runHook postInstall
             '';
 
             postFixup = ''
-              wrapProgram $out/bin/${pname} \
-                --prefix PATH : ${pkgs.lib.makeBinPath [ pkgs.nodejs_24 ]}
+              for bin in $out/bin/*; do
+                wrapProgram "$bin" \
+                  --prefix PATH : ${pkgs.lib.makeBinPath [ pkgs.nodejs_24 ]}
+              done
             '';
           };
       };
@@ -191,7 +215,17 @@
         in
         {
           options.programs.eyezah-ui = {
-            enable = lib.mkEnableOption "Eyezah UI";
+            shell.enable = lib.mkEnableOption "Eyezah UI desktop shell";
+
+            greeter = {
+              enable = lib.mkEnableOption "Eyezah UI greeter";
+
+              sessionsDir = lib.mkOption {
+                type = lib.types.nullOr lib.types.str;
+                default = null;
+                description = "Directory containing available login sessions.";
+              };
+            };
 
             instanceId = lib.mkOption {
               type = lib.types.str;
@@ -201,15 +235,29 @@
 
             package = lib.mkOption {
               type = lib.types.package;
-              default = (self.lib.mkEyezahUI pkgs.system {
-                instanceId = cfg.instanceId;
-                homeDirectory = config.home.homeDirectory;
-              });
-              description = "The final eyezah-ui package derivation.";
+              default =
+                self.lib.mkEyezahUI pkgs.system {
+                  instanceId = cfg.instanceId;
+                  homeDirectory = config.home.homeDirectory;
+                  enableShell = cfg.shell.enable;
+                  enableGreeter = cfg.greeter.enable;
+                  sessionsDir = cfg.greeter.sessionsDir;
+                };
+              description = "Final eyezah-ui package derivation.";
             };
           };
 
-          config = lib.mkIf cfg.enable {
+          config = lib.mkIf (cfg.shell.enable || cfg.greeter.enable) {
+            assertions = [
+              {
+                assertion =
+                  !(cfg.greeter.enable) || (cfg.greeter.sessionsDir != null);
+
+                message =
+                  "programs.eyezah-ui.greeter.sessionsDir must be set when greeter.enable = true.";
+              }
+            ];
+
             home.packages = [ cfg.package ];
           };
         };
