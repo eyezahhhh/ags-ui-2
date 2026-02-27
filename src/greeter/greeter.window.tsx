@@ -23,12 +23,8 @@ import { PowerButtonGroup } from "./components/power-button-group/power-button-g
 import { KeyboardPasswordInput } from "./components/keyboard-password-input/keyboard-password-input.component";
 import { LoginSection } from "./components/login-section/login-section.component";
 import { IS_DEV } from "@const/is-dev";
+import { SESSIONS_DIRECTORY } from "@const/sessions-directory";
 // import Wallpaper from "@service/wallpaper";
-
-// const SESSION_DIRECTORIES = ["./example-desktop-sessions"];
-const SESSION_DIRECTORIES = [
-	"/nix/store/qfsdwig2cy6zsc0920674h75kmd68kvg-custom-sessions-bundle/share/wayland-sessions",
-];
 
 export function GreeterWindow(gdkMonitor: Gdk.Monitor) {
 	const { TOP, BOTTOM, LEFT, RIGHT } = Astal.WindowAnchor;
@@ -40,7 +36,7 @@ export function GreeterWindow(gdkMonitor: Gdk.Monitor) {
 	let window: Gtk.Window | null = null;
 	// const wallpaperService = Wallpaper.get_default();
 
-	getDesktopSessions(SESSION_DIRECTORIES)
+	getDesktopSessions([SESSIONS_DIRECTORY])
 		.then(setSessions)
 		.catch((error) => {
 			console.error(error);

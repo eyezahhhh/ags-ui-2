@@ -68,12 +68,14 @@
                 pkgs.libsoup_3
                 pkgs.glib-networking
                 pkgs.accountsservice
+                pkgs.papirus-icon-theme
               ];
           in
           pkgs.buildNpmPackage {
             name = pname;
             src = ./.;
             dontNpmBuild = true;
+            dontWrapQtApps = true;
             npmDepsHash = "sha256-5L+u1IJ6GkdEQEVqo5IKPVw5XlNrO+f7D+pq2ArYOhY=";
 
             nativeBuildInputs = [
@@ -143,7 +145,8 @@
             postFixup = ''
               for bin in $out/bin/*; do
                 wrapProgram "$bin" \
-                  --prefix PATH : ${pkgs.lib.makeBinPath [ pkgs.nodejs_24 ]}
+                  --prefix PATH : ${pkgs.lib.makeBinPath [ pkgs.nodejs_24 ]} \
+                  --prefix XDG_DATA_DIRS : ${pkgs.papirus-icon-theme}/share
               done
             '';
           };
@@ -188,6 +191,7 @@
               pkgs.glib-networking
               pkgs.nodejs_24
               pkgs.accountsservice
+              pkgs.papirus-icon-theme
             ];
         in
         {

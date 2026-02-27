@@ -11,6 +11,7 @@ import Pango from "gi://Pango?version=1.0";
 import { readFileAsync, writeFileAsync } from "ags/file";
 import AstalHyprland from "gi://AstalHyprland?version=0.1";
 import styles from "./code.launcher-handler.style";
+import { compareString } from "@util/string";
 
 const CACHE_LOCATION = `${CACHE_DIRECTORY}/code-recent.txt`;
 const PREFIX = "code";
@@ -103,6 +104,8 @@ export class CodeLauncherHandler extends LauncherHandler {
 						if (this.currentPromise != promise) {
 							return;
 						}
+
+						contents.sort((a, b) => compareString(a.get_name(), b.get_name()));
 
 						const path = file.get_path()!;
 						const icons = (
