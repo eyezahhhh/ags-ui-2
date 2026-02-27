@@ -40,6 +40,9 @@
                              , enableShell ? true
                              , enableGreeter ? false
                              , sessionsDir ? "/usr/share/wayland-sessions"
+                             , enabledMonitors ? null
+                             , disabledMonitors ? null
+                             , scale ? null
                              }:
           let
             pkgs = nixpkgs.legacyPackages.${system};
@@ -89,6 +92,7 @@
             buildInputs = extraPackages ++ [
               pkgs.gjs
               pkgs.nodejs_24
+              pkgs.wlr-randr
             ];
 
             postPatch = ''
@@ -136,7 +140,10 @@
                 --gtk 4 \
                 -d "SRC='$out/share'" \
                 -d "INSTANCE_ID='${instanceId}'" \
-                -d "SESSIONS_DIR='${sessionsDir}'"
+                -d "SESSIONS_DIR='${sessionsDir}'" \
+                ${pkgs.lib.optionalString (enabledMonitors != []) "-d \"ENABLED_MONITORS='${builtins.concatStringsSep ":" enabledMonitors}'\""}
+                ${pkgs.lib.optionalString (disabledMonitors != []) "-d \"DISABLED_MONITORS='${builtins.concatStringsSep ":" disabledMonitors}'\""}
+                ${pkgs.lib.optionalString (scale != null) "-d \"SCALE='${toString scale}'\""}
             ''
             + ''
               runHook postInstall
@@ -145,7 +152,10 @@
             postFixup = ''
               for bin in $out/bin/*; do
                 wrapProgram "$bin" \
-                  --prefix PATH : ${pkgs.lib.makeBinPath [ pkgs.nodejs_24 ]} \
+                  --prefix PATH : ${pkgs.lib.makeBinPath [
+                    pkgs.nodejs_24
+                    pkgs.wlr-randr
+                  ]} \
                   --prefix XDG_DATA_DIRS : ${pkgs.papirus-icon-theme}/share
               done
             '';
@@ -191,7 +201,6 @@
               pkgs.glib-networking
               pkgs.nodejs_24
               pkgs.accountsservice
-              pkgs.papirus-icon-theme
             ];
         in
         {
@@ -204,6 +213,7 @@
               (ags.packages.${system}.default.override {
                 inherit extraPackages;
               })
+              pkgs.papirus-icon-theme
             ];
           };
         }
@@ -229,6 +239,24 @@
                 default = null;
                 description = "Directory containing available login sessions.";
               };
+
+              enabledMonitors = lib.mkOption {
+                type = lib.types.listOf lib.types.str;
+                default = [ ];
+                description = "List of monitors the greeter should enable.";
+              };
+
+              disabledMonitors = lib.mkOption {
+                type = lib.types.listOf lib.types.str;
+                default = [ ];
+                description = "List of monitors the greeter should disable.";
+              };
+
+              scale = lib.mkOption {
+                type = lib.types.nullOr lib.types.float;
+                default = null;
+                description = "Optional UI scale factor for the greeter.";
+              };
             };
 
             instanceId = lib.mkOption {
@@ -246,6 +274,9 @@
                   enableShell = cfg.shell.enable;
                   enableGreeter = cfg.greeter.enable;
                   sessionsDir = cfg.greeter.sessionsDir;
+                  enabledMonitors = cfg.greeter.enabledMonitors;
+                  disabledMonitors = cfg.greeter.disabledMonitors;
+                  scale = cfg.greeter.scale;
                 };
               description = "Final eyezah-ui package derivation.";
             };
