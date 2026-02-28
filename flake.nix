@@ -159,6 +159,7 @@
                   --prefix PATH : ${pkgs.lib.makeBinPath [
                     pkgs.nodejs_24
                     pkgs.wlr-randr
+                    pkgs.imagemagick
                   ]} \
                   --prefix XDG_DATA_DIRS : ${pkgs.papirus-icon-theme}/share
               done
