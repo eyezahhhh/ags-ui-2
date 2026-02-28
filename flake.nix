@@ -94,6 +94,7 @@
               pkgs.gjs
               pkgs.nodejs_24
               pkgs.wlr-randr
+              pkgs.imagemagick
             ];
 
             postPatch = ''
