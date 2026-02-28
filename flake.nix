@@ -43,6 +43,7 @@
                              , enabledMonitors ? null
                              , disabledMonitors ? null
                              , scale ? null
+                             , wallpaperDir ? null
                              }:
           let
             pkgs = nixpkgs.legacyPackages.${system};
@@ -129,7 +130,8 @@
                 --root . \
                 --gtk 4 \
                 -d "SRC='$out/share'" \
-                -d "INSTANCE_ID='${instanceId}'"
+                -d "INSTANCE_ID='${instanceId}'" \
+                ${pkgs.lib.optionalString (wallpaperDir != null) "-d \"WALLPAPER_DIR='${wallpaperDir}'\""}
             ''
             + pkgs.lib.optionalString enableGreeter ''
               echo "Bundling greeter..."
@@ -143,7 +145,8 @@
                 -d "SESSIONS_DIR='${sessionsDir}'" \
                 ${pkgs.lib.optionalString (enabledMonitors != []) "-d \"ENABLED_MONITORS='${builtins.concatStringsSep ":" enabledMonitors}'\""} \
                 ${pkgs.lib.optionalString (disabledMonitors != []) "-d \"DISABLED_MONITORS='${builtins.concatStringsSep ":" disabledMonitors}'\""} \
-                ${pkgs.lib.optionalString (scale != null) "-d \"SCALE='${toString scale}'\""}
+                ${pkgs.lib.optionalString (scale != null) "-d \"SCALE='${toString scale}'\""} \
+                ${pkgs.lib.optionalString (wallpaperDir != null) "-d \"WALLPAPER_DIR='${wallpaperDir}'\""}
             ''
             + ''
               runHook postInstall
@@ -229,6 +232,16 @@
         in
         {
           options.programs.eyezah-ui = {
+            wallpaperDir = lib.mkOption {
+              type = lib.types.nullOr (lib.types.oneOf [ lib.types.str lib.types.path ]);
+              default = null;
+              description = ''
+                Path to wallpaper directory. Can be:
+                  - a relative path in the flake (e.g., ./wallpaper)
+                  - an absolute path (e.g., /home/eyezah/.wallpapers)
+              '';
+            };
+
             shell.enable = lib.mkEnableOption "Eyezah UI desktop shell";
 
             greeter = {
@@ -277,6 +290,7 @@
                   enabledMonitors = cfg.greeter.enabledMonitors;
                   disabledMonitors = cfg.greeter.disabledMonitors;
                   scale = cfg.greeter.scale;
+                  wallpaperDir = cfg.wallpaperDir;
                 };
               description = "Final eyezah-ui package derivation.";
             };

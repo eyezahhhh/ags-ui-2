@@ -24,6 +24,7 @@ import { KeyboardPasswordInput } from "./components/keyboard-password-input/keyb
 import { LoginSection } from "./components/login-section/login-section.component";
 import { IS_DEV } from "@const/is-dev";
 import { SESSIONS_DIRECTORY } from "@const/sessions-directory";
+import Wallpaper from "@service/wallpaper";
 // import Wallpaper from "@service/wallpaper";
 
 export function GreeterWindow(gdkMonitor: Gdk.Monitor) {
@@ -34,7 +35,7 @@ export function GreeterWindow(gdkMonitor: Gdk.Monitor) {
 	const gamepad = Gamepad.get_default();
 	const destroyer = new Destroyer();
 	let window: Gtk.Window | null = null;
-	// const wallpaperService = Wallpaper.get_default();
+	const wallpaperService = Wallpaper.get_default();
 
 	getDesktopSessions([SESSIONS_DIRECTORY])
 		.then(setSessions)
@@ -178,8 +179,8 @@ export function GreeterWindow(gdkMonitor: Gdk.Monitor) {
 						);
 					}}
 				>
-					<box hexpand vexpand />
-					{/* <revealer
+					{/* <box hexpand vexpand /> */}
+					<revealer
 						cssClasses={[styles.background]}
 						hexpand
 						vexpand
@@ -208,7 +209,7 @@ export function GreeterWindow(gdkMonitor: Gdk.Monitor) {
 						// 		return picture;
 						// 	},
 						// )}
-					/> */}
+					/>
 				</Gtk.Overlay>
 			</box>
 		</window>
