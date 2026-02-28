@@ -2,13 +2,18 @@ import { CACHE_DIRECTORY } from "@const/cache-directory";
 import { LauncherEntry, LauncherHandler } from "../launcher-handler";
 import { doesCommandExist } from "@util/cli";
 import { HOME } from "@const/home";
-import { getFileInfo, getFileType, scanDirectory } from "@util/file";
+import {
+	getFileInfo,
+	getFileType,
+	scanDirectory,
+	writeFileOrSymlink,
+} from "@util/file";
 import Gio from "gi://Gio?version=2.0";
 import { Astal, Gtk } from "ags/gtk4";
 import GObject from "gnim/gobject";
 import { bulkGetIcons, getIcons } from "@util/file-icon";
 import Pango from "gi://Pango?version=1.0";
-import { readFileAsync, writeFileAsync } from "ags/file";
+import { readFileAsync } from "ags/file";
 import AstalHyprland from "gi://AstalHyprland?version=0.1";
 import styles from "./code.launcher-handler.style";
 import { compareString } from "@util/string";
@@ -259,7 +264,7 @@ export class CodeLauncherHandler extends LauncherHandler {
 			console.error(e);
 			try {
 				contents = "";
-				await writeFileAsync(CACHE_LOCATION, "\n");
+				await writeFileOrSymlink(CACHE_LOCATION, "\n");
 			} catch (e) {
 				console.error("Failed to create file");
 				return;
@@ -334,7 +339,7 @@ export class CodeLauncherHandler extends LauncherHandler {
 			const contents =
 				this.cache.map((e) => `${e.frequency} ${e.path}`).join("\n") + "\n";
 
-			await writeFileAsync(CACHE_LOCATION, contents);
+			await writeFileOrSymlink(CACHE_LOCATION, contents);
 		} catch (e) {
 			console.error("Failed to update code cache", e);
 		}

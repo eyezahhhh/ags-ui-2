@@ -163,3 +163,36 @@ export async function scanDirectory(file: Gio.File) {
 		);
 	});
 }
+
+export function writeFileOrSymlink(
+	file: string | Gio.File,
+	content: string,
+): Promise<Gio.File> {
+	return new Promise((resolve, reject) => {
+		const gfile = typeof file === "string" ? Gio.File.new_for_path(file) : file;
+		const path = typeof file === "string" ? file : gfile.get_path();
+
+		if (!path) return reject(Error("path is null"));
+
+		const dir = GLib.path_get_dirname(path);
+		if (!GLib.file_test(dir, GLib.FileTest.IS_DIR)) {
+			Gio.File.new_for_path(dir).make_directory_with_parents(null);
+		}
+
+		gfile.replace_contents_bytes_async(
+			new GLib.Bytes(new TextEncoder().encode(content)),
+			null,
+			false,
+			0,
+			null,
+			(_, res) => {
+				try {
+					gfile.replace_contents_finish(res);
+					resolve(gfile);
+				} catch (error) {
+					reject(error);
+				}
+			},
+		);
+	});
+}
