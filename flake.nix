@@ -146,8 +146,8 @@
                 -d "SRC='$out/share'" \
                 -d "INSTANCE_ID='${instanceId}'" \
                 -d "SESSIONS_DIR='${sessionsDir}'" \
-                ${pkgs.lib.optionalString (enabledMonitors != null && enabledMonitors != [] ) "-d \"ENABLED_MONITORS='${builtins.concatStringsSep ":" enabledMonitors}'\""} /
-                ${pkgs.lib.optionalString (disabledMonitors != null && disabledMonitors != [] ) "-d \"DISABLED_MONITORS='${builtins.concatStringsSep ":" disabledMonitors}'\""} /
+                ${pkgs.lib.optionalString (enabledMonitors != null && enabledMonitors != [] ) "-d \"ENABLED_MONITORS='${builtins.concatStringsSep ":" enabledMonitors}'\""} \
+                ${pkgs.lib.optionalString (disabledMonitors != null && disabledMonitors != [] ) "-d \"DISABLED_MONITORS='${builtins.concatStringsSep ":" disabledMonitors}'\""} \
                 ${pkgs.lib.optionalString (scale != null) "-d \"SCALE='${toString scale}'\""} \
                 ${pkgs.lib.optionalString (wallpaperDir != null) "-d \"WALLPAPER_DIR='${wallpaperDir}'\""}
             ''

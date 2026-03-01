@@ -110,15 +110,18 @@ export function GamepadPasswordInput({ isLoggingIn, onLoginAttempt }: Props) {
 				buttonsDestroyer = new Destroyer();
 
 				const buttons = controller.buttons;
-				const buttonsPressed = buttons.map((button) => button.value == 1);
+				const buttonsPressed = new Map<Gamepad.ButtonId, boolean>();
+				for (const button of buttons) {
+					buttonsPressed.set(button.button_id, button.value == 1);
+				}
 
-				for (const [index, button] of buttons.entries()) {
+				for (const button of buttons) {
 					buttonsDestroyer.addDisconnect(
 						button,
 						button.connect("notify::value", () => {
 							const pressed = button.value == 1;
-							if (buttonsPressed[index] != pressed) {
-								buttonsPressed[index] = pressed;
+							if (buttonsPressed.get(button.button_id) != pressed) {
+								buttonsPressed.set(button.button_id, pressed);
 								if (
 									!isLoggingIn.get() &&
 									pressed &&
@@ -134,7 +137,7 @@ export function GamepadPasswordInput({ isLoggingIn, onLoginAttempt }: Props) {
 										blockedChars += inputs[i].character;
 									}
 
-									const input = new ButtonInput(blockedChars, index);
+									const input = new ButtonInput(blockedChars, button.button_id);
 									setPassword([...password.get(), input]);
 								}
 							}
