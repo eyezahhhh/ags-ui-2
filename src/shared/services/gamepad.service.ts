@@ -1,5 +1,7 @@
+import { createCommandProcess } from "@util/cli";
 import { Destroyer } from "@util/destroyer";
 import { UnixSocket } from "@util/socket";
+import Manette from "gi://Manette?version=0.2";
 import GObject, { getter, register } from "gnim/gobject";
 
 interface SerializedGamepadButton {
@@ -8,19 +10,19 @@ interface SerializedGamepadButton {
 	value: number;
 }
 
-type SerializedGamepad = {
-	id: string;
-	index: number;
-} & (
-	| {
-			connected: false;
-	  }
-	| {
-			connected: true;
-			buttons: SerializedGamepadButton[];
-			axes: number[];
-	  }
-);
+// type SerializedGamepad = {
+// 	id: string;
+// 	index: number;
+// } & (
+// 	| {
+// 			connected: false;
+// 	  }
+// 	| {
+// 			connected: true;
+// 			buttons: SerializedGamepadButton[];
+// 			axes: number[];
+// 	  }
+// );
 
 namespace Gamepad {
 	export enum GamepadDirection {
@@ -31,37 +33,60 @@ namespace Gamepad {
 		RIGHT = "right",
 	}
 
+	export enum ButtonId {
+		SOUTH = 304,
+		EAST = 305,
+		WEST = 308,
+		NORTH = 307,
+		DPAD_DOWN = 545,
+		DPAD_RIGHT = 547,
+		DPAD_LEFT = 546,
+		DPAD_UP = 544,
+		LEFT_STICK = 317,
+		RIGHT_STICK = 318,
+		LEFT_BUMPER = 310,
+		RIGHT_BUMPER = 311,
+		LEFT_TRIGGER = 312,
+		RIGHT_TRIGGER = 313,
+		SELECT = 314,
+		START = 315,
+		GUIDE = 316,
+	}
+
 	@register()
 	export class GamepadButton extends GObject.Object {
-		private _pressed: boolean;
-		private _touched: boolean;
-		private _value: number;
+		private _pressed = false;
+		private _touched = false;
+		private _value = 0;
 
 		constructor(
-			json: SerializedGamepadButton,
-			addUpdateListener: (
-				self: GamepadButton,
-				callback: (json: SerializedGamepadButton) => void,
-			) => void,
+			private readonly _id: ButtonId,
+			initial: SerializedGamepadButton,
 		) {
 			super();
-			addUpdateListener(this, (json) => {
-				if (this._pressed != json.pressed) {
-					this._pressed = json.pressed;
-					this.notify("is_pressed");
-				}
-				if (this._touched != json.touched) {
-					this._touched = json.touched;
-					this.notify("is_touched");
-				}
-				if (this._value != json.value) {
-					this._value = json.value;
-					this.notify("value");
-				}
-			});
-			this._pressed = json.pressed;
-			this._touched = json.touched;
-			this._value = json.value;
+
+			if (initial) {
+				this._pressed = initial.pressed;
+				this._touched = initial.touched;
+				this._value = initial.value;
+			}
+		}
+
+		update(json: SerializedGamepadButton) {
+			if (this._pressed !== json.pressed) {
+				this._pressed = json.pressed;
+				this.notify("is_pressed");
+			}
+
+			if (this._touched !== json.touched) {
+				this._touched = json.touched;
+				this.notify("is_touched");
+			}
+
+			if (this._value !== json.value) {
+				this._value = json.value;
+				this.notify("value");
+			}
 		}
 
 		@getter(Boolean)
@@ -78,176 +103,183 @@ namespace Gamepad {
 		get value() {
 			return this._value;
 		}
+
+		@getter(Number)
+		get button_id() {
+			return this._id;
+		}
 	}
 
 	@register()
 	export class Gamepad extends GObject.Object {
-		private _index: number;
-		private _id: string;
 		private _axes: number[] = [];
-		private _connected: boolean;
+		private _connected = true;
 		private _direction = GamepadDirection.NONE;
-		private _buttons: {
-			button: GamepadButton;
-			update: (json: SerializedGamepadButton) => void;
-		}[] = [];
+		private readonly _buttons = new Map<ButtonId, GamepadButton>();
+
+		private _id: string;
 
 		constructor(
-			json: SerializedGamepad,
-			addUpdateListener: (
-				self: Gamepad,
-				callback: (json: SerializedGamepad) => void,
-			) => void,
+			private readonly _index: number,
+			private readonly _device: Manette.Device,
 		) {
 			super();
 
-			addUpdateListener(this, (json) => {
-				if (this._index != json.index) {
-					this._index = json.index;
-					this.notify("index");
-				}
-				if (this._id != json.id) {
-					this._id = json.id;
-					this.notify("id");
-				}
-				if (this._connected != json.connected) {
-					this._connected = json.connected;
-					this.notify("is_connected");
-				}
-				if (json.connected) {
-					this.populateButtons(json.buttons);
-					if (this._axes.length == json.axes.length) {
-						for (let i = 0; i < json.axes.length; i++) {
-							if (this._axes[i] != json.axes[i]) {
-								this._axes = json.axes;
-								this.notify("axes");
-								break;
-							}
-						}
-					} else {
-						this._axes = json.axes;
-						this.notify("axes");
-					}
-				} else {
-					if (this._buttons.length) {
-						this._buttons = [];
-						this.notify("buttons");
-					}
-				}
+			this._id = _device.get_guid();
+
+			// --- DEVICE DISCONNECT ---
+			this._device.connect("disconnected", () => {
+				this._connected = false;
+				this._buttons.clear();
+				this._axes = [];
+				this.notify("is_connected");
+				this.notify("buttons");
+				this.notify("axes");
 			});
 
-			this._index = json.index;
-			this._id = json.id;
-			this._connected = json.connected;
-			if (json.connected) {
-				this._axes = json.axes;
-				this.populateButtons(json.buttons);
+			for (const [name, index] of Object.entries(ButtonId)) {
+				if (typeof index != "number") {
+					continue;
+				}
+
+				this.ensureButtonIndex(index);
+				if (this._device.has_input(1, index)) {
+					console.log("Gamepad has button", name);
+				} else {
+					console.log("Gamepad doesn't have button", name);
+				}
 			}
 
-			let buttonsChangeDestroyer: Destroyer | null = null;
-			const onButtonsChange = () => {
-				buttonsChangeDestroyer?.destroy();
-				const destroyer = new Destroyer();
-				buttonsChangeDestroyer = destroyer;
-
-				const buttons = this.buttons;
-
-				const DIRECTION_KEYS: Record<number, GamepadDirection> = {
-					[12]: GamepadDirection.UP,
-					[13]: GamepadDirection.DOWN,
-					[14]: GamepadDirection.LEFT,
-					[15]: GamepadDirection.RIGHT,
-				};
-				const directionKeyIndexes = Object.keys(DIRECTION_KEYS)
-					.map((key) => parseInt(key))
-					.sort();
-
-				if (buttons[directionKeyIndexes[directionKeyIndexes.length - 1]]) {
-					for (let index of directionKeyIndexes) {
-						const direction = DIRECTION_KEYS[index];
-						const button = buttons[index];
-						destroyer.addDisconnect(
-							button,
-							button.connect("notify::is-pressed", () => {
-								if (button.is_pressed) {
-									if (this._direction != direction) {
-										this._direction = direction;
-										this.notify("direction");
-									}
-								} else if (this._direction == direction) {
-									this._direction = GamepadDirection.NONE;
-									this.notify("direction");
-								}
-							}),
-						);
-					}
-				}
+			const DIRECTIONAL_BUTTONS: Partial<Record<ButtonId, GamepadDirection>> = {
+				[ButtonId.DPAD_DOWN]: GamepadDirection.DOWN,
+				[ButtonId.DPAD_UP]: GamepadDirection.UP,
+				[ButtonId.DPAD_LEFT]: GamepadDirection.UP,
+				[ButtonId.DPAD_RIGHT]: GamepadDirection.RIGHT,
 			};
-			this.connect("notify::buttons", onButtonsChange);
-			onButtonsChange();
 
-			let joystickDirection = GamepadDirection.NONE;
-			this.connect("notify::axes", () => {
-				const axes = this.axes;
-				if (axes.length < 2) {
-					return;
-				}
-				const x = Math.round(axes[0]);
-				const y = Math.round(axes[1]);
+			// --- BUTTON PRESS ---
+			this._device.connect("button-press-event", (_device, event) => {
+				const [ok, buttonIndex] = event.get_button();
+				if (!ok) return;
 
-				let direction = GamepadDirection.NONE;
-				if (!y) {
-					if (x == 1) {
-						direction = GamepadDirection.RIGHT;
-					}
-					if (x == -1) {
-						direction = GamepadDirection.LEFT;
-					}
-				}
-				if (!x) {
-					if (y == 1) {
-						direction = GamepadDirection.DOWN;
-					}
-					if (y == -1) {
-						direction = GamepadDirection.UP;
-					}
-				}
-				if (joystickDirection != direction) {
-					joystickDirection = direction;
-					if (this._direction != direction) {
-						if (direction == GamepadDirection.NONE) {
-							if (!x && !y) {
-								this._direction = GamepadDirection.NONE;
-								this.notify("direction");
-							}
-						} else {
-							this._direction = direction;
-							this.notify("direction");
-						}
-					}
+				console.log("BUTTON INDEX", buttonIndex);
+
+				this.ensureButtonIndex(buttonIndex);
+				this._buttons.get(buttonIndex)?.update({
+					pressed: true,
+					touched: true,
+					value: 1,
+				});
+
+				const direction = DIRECTIONAL_BUTTONS[buttonIndex as ButtonId];
+				if (direction && this._direction !== direction) {
+					this._direction = direction;
+					this.notify("direction");
 				}
 			});
+
+			// --- BUTTON RELEASE ---
+			this._device.connect("button-release-event", (_device, event) => {
+				const [ok, buttonIndex] = event.get_button();
+				if (!ok) return;
+
+				this.ensureButtonIndex(buttonIndex);
+				this._buttons.get(buttonIndex)?.update({
+					pressed: false,
+					touched: false,
+					value: 0,
+				});
+
+				const direction = DIRECTIONAL_BUTTONS[buttonIndex as ButtonId];
+				if (direction && direction == this._direction) {
+					this._direction = GamepadDirection.NONE;
+					this.notify("direction");
+				}
+			});
+
+			this._device.connect("absolute-axis-event", (_device, event) => {
+				const [ok, axisIndex, value] = event.get_absolute();
+				if (!ok) return;
+
+				this.ensureAxisIndex(axisIndex);
+
+				if (this._axes[axisIndex] !== value) {
+					this._axes[axisIndex] = value;
+					this.notify("axes");
+				}
+			});
+
+			this.setupDirectionTracking();
 		}
 
-		private populateButtons(buttons: SerializedGamepadButton[]) {
-			const changed = buttons.length != this._buttons.length;
-			this._buttons = this._buttons.slice(0, buttons.length);
-			for (let [index, button] of this._buttons.entries()) {
-				button.update(buttons[index]);
-			}
-			for (let i = this._buttons.length; i < buttons.length; i++) {
-				new GamepadButton(buttons[i], (button, update) => {
-					this._buttons.push({ button, update });
-				});
-			}
-			if (changed) {
+		// --- Helpers ---
+
+		private ensureButtonIndex(index: ButtonId) {
+			if (!this._buttons.has(index)) {
+				this._buttons.set(
+					index,
+					new GamepadButton(index, {
+						pressed: false,
+						touched: false,
+						value: 0,
+					}),
+				);
 				this.notify("buttons");
 			}
 		}
 
+		private ensureAxisIndex(index: number) {
+			if (this._axes[index] === undefined) {
+				this._axes[index] = 0;
+				this.notify("axes");
+			}
+		}
+
+		private setupDirectionTracking() {
+			let joystickDirection = GamepadDirection.NONE;
+
+			this.connect("notify::axes", () => {
+				if (this._axes.length < 2) return;
+
+				const x = Math.round(this._axes[0]);
+				const y = Math.round(this._axes[1]);
+
+				let direction = GamepadDirection.NONE;
+
+				if (!y) {
+					if (x === 1) direction = GamepadDirection.RIGHT;
+					if (x === -1) direction = GamepadDirection.LEFT;
+				}
+
+				if (!x) {
+					if (y === 1) direction = GamepadDirection.DOWN;
+					if (y === -1) direction = GamepadDirection.UP;
+				}
+
+				if (joystickDirection !== direction) {
+					joystickDirection = direction;
+					if (this._direction !== direction) {
+						this._direction = direction;
+						this.notify("direction");
+					}
+				}
+			});
+		}
+
+		// --- Getters ---
+
+		@getter(Object)
+		get device() {
+			return this._device;
+		}
+
 		@getter(Object)
 		get buttons() {
-			return this._buttons.map((button) => button.button);
+			return [...this._buttons.values()];
+		}
+
+		get_button(id: ButtonId) {
+			return this._buttons.get(id) || null;
 		}
 
 		@getter(Object)
@@ -278,74 +310,54 @@ namespace Gamepad {
 
 	@register()
 	export class GamepadService extends GObject.Object {
-		private _socket: UnixSocket | null = null;
-		private readonly _gamepads = new Map<
-			number,
-			{ gamepad: Gamepad; update: (json: SerializedGamepad) => void }
-		>();
-		private _timeout = 0;
+		private readonly _gamepads = new Map<number, Gamepad>();
+		private _currentIndex = 0;
 
 		constructor() {
 			super();
 
-			this.listen();
-		}
+			const newDevice = (device: Manette.Device) => {
+				const index = this._currentIndex++;
+				this._gamepads.set(index, new Gamepad(index, device));
+			};
 
-		private retryListen() {
-			this._socket?.close();
-			if (this._timeout) {
-				this._timeout = Math.min(16, this._timeout * 2);
-			} else {
-				this._timeout = 1;
-			}
-			setTimeout(() => this.listen(), this._timeout * 1000);
-		}
+			const monitor = new Manette.Monitor();
 
-		private listen() {
-			if (this._socket) {
-				this._socket.close();
-			}
+			monitor.connect("device-connected", (_monitor, device) => {
+				console.log("DEVICE CONNECTED", device.get_name());
+				newDevice(device);
+				this.notify("gamepads");
+			});
 
-			const socket = new UnixSocket("/tmp/gamepad-listener.sock");
-			this._socket = socket;
-
-			socket.addEventListener("data", (chunk) => {
-				try {
-					const json = JSON.parse(chunk) as SerializedGamepad;
-					const gamepad = this._gamepads.get(json.index);
-					if (gamepad) {
-						// todo: handle connected: false
-						gamepad.update(json);
-					} else {
-						new Gamepad(json, (gamepad, update) => {
-							this._gamepads.set(json.index, {
-								gamepad,
-								update,
-							});
-							console.log(`Registered new Gamepad #${json.index} (${json.id})`);
-						});
+			monitor.connect("device-disconnected", (_monitor, device) => {
+				for (const [index, gamepad] of this._gamepads) {
+					if (gamepad.device == device) {
+						this._gamepads.delete(index);
 						this.notify("gamepads");
 					}
-				} catch (e) {
-					console.error(e);
 				}
 			});
 
-			socket.addEventListener("error", () => {
-				console.log("Gamepad socket error");
-				this.retryListen();
-			});
+			const iter = monitor.iterate();
+			let changed = false;
+			while (true) {
+				const [ok, device] = iter.next();
+				if (!ok || !device) {
+					break;
+				}
 
-			socket.addEventListener("close", () => {
-				console.log("Gamepad socket closed");
-				this.retryListen();
-			});
+				newDevice(device);
+				changed = true;
+			}
+			if (changed) {
+				this.notify("gamepads");
+			}
 		}
 
 		@getter(Object)
 		get gamepads() {
 			return Array.from(this._gamepads.values())
-				.map((gamepad) => gamepad.gamepad)
+				.map((gamepad) => gamepad)
 				.sort((a, b) => a.index - b.index);
 		}
 
@@ -385,7 +397,6 @@ namespace Gamepad {
 			callback: (
 				gamepad: Gamepad.Gamepad,
 				button: Gamepad.GamepadButton,
-				buttonIndex: number,
 			) => void,
 		) {
 			const destroyers = new Map<number, Destroyer>();
@@ -396,12 +407,10 @@ namespace Gamepad {
 					const destroyer = new Destroyer();
 					destroyers.set(gamepad.index, destroyer);
 
-					for (const [buttonIndex, button] of gamepad.buttons.entries()) {
+					for (const button of gamepad.buttons) {
 						destroyer.addDisconnect(
 							button,
-							button.connect(signal, () =>
-								callback(gamepad, button, buttonIndex),
-							),
+							button.connect(signal, () => callback(gamepad, button)),
 						);
 					}
 				},

@@ -85,9 +85,10 @@ export function Group({
 						destroyer.add(
 							gamepad.connectForAllGamepadButtons(
 								"notify::value",
-								(_gamepad, button, buttonIndex) => {
+								(_gamepad, button) => {
 									if (button.value == 1) {
-										if (buttonIndex == 0) {
+										if (button.button_id == Gamepad.ButtonId.SOUTH) {
+											console.log("Focus group!");
 											const focusedButtonIndex = focusedButton();
 											if (focusedButtonIndex >= 0) {
 												onClicked?.(focusedButtonIndex);
@@ -95,7 +96,8 @@ export function Group({
 												setFocusedButton(0);
 											}
 										}
-										if (buttonIndex == 1) {
+										if (button.button_id == Gamepad.ButtonId.EAST) {
+											console.log("Leave group[!");
 											setFocusedButton(-1);
 											container?.grab_focus();
 										}

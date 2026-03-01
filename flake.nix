@@ -73,6 +73,8 @@
                 pkgs.glib-networking
                 pkgs.accountsservice
                 pkgs.papirus-icon-theme
+                pkgs.libmanette
+                pkgs.libgudev
               ];
           in
           pkgs.buildNpmPackage {
@@ -80,7 +82,7 @@
             src = ./.;
             dontNpmBuild = true;
             dontWrapQtApps = true;
-            npmDepsHash = "sha256-5L+u1IJ6GkdEQEVqo5IKPVw5XlNrO+f7D+pq2ArYOhY=";
+            npmDepsHash = "sha256-rIDGh0yGbT23hHw7EAKo6PPjW8A+QpOT11WBnGMC0qg=";
 
             nativeBuildInputs = [
               pkgs.wrapGAppsHook4
@@ -144,8 +146,8 @@
                 -d "SRC='$out/share'" \
                 -d "INSTANCE_ID='${instanceId}'" \
                 -d "SESSIONS_DIR='${sessionsDir}'" \
-                ${pkgs.lib.optionalString (enabledMonitors != []) "-d \"ENABLED_MONITORS='${builtins.concatStringsSep ":" enabledMonitors}'\""} \
-                ${pkgs.lib.optionalString (disabledMonitors != []) "-d \"DISABLED_MONITORS='${builtins.concatStringsSep ":" disabledMonitors}'\""} \
+                ${pkgs.lib.optionalString (enabledMonitors != null && enabledMonitors != [] ) "-d \"ENABLED_MONITORS='${builtins.concatStringsSep ":" enabledMonitors}'\""} /
+                ${pkgs.lib.optionalString (disabledMonitors != null && disabledMonitors != [] ) "-d \"DISABLED_MONITORS='${builtins.concatStringsSep ":" disabledMonitors}'\""} /
                 ${pkgs.lib.optionalString (scale != null) "-d \"SCALE='${toString scale}'\""} \
                 ${pkgs.lib.optionalString (wallpaperDir != null) "-d \"WALLPAPER_DIR='${wallpaperDir}'\""}
             ''
@@ -206,6 +208,8 @@
               pkgs.glib-networking
               pkgs.nodejs_24
               pkgs.accountsservice
+              pkgs.libmanette
+              pkgs.libgudev
             ];
         in
         {

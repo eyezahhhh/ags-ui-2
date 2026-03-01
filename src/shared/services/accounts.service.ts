@@ -10,6 +10,7 @@ namespace Accounts {
 			super();
 			const manager = A.UserManager.get_default();
 			if (manager.isLoaded) {
+				console.log("ACCOUNTS MANAGER LOADED");
 				this._users = manager.list_users();
 			} else {
 				this._users = [];

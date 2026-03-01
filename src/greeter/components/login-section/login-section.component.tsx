@@ -4,6 +4,7 @@ import { GamepadPasswordInput } from "../gamepad-password-input/gamepad-password
 import { KeyboardPasswordInput } from "../keyboard-password-input/keyboard-password-input.component";
 import { IDesktopSession } from "@interface/desktop-session";
 import AstalGreet from "gi://AstalGreet?version=0.1";
+import Gamepad from "@service/gamepad";
 
 interface Props {
 	controllerMode: Accessor<boolean>;
@@ -11,7 +12,10 @@ interface Props {
 }
 
 export function LoginSection({ controllerMode, session }: Props) {
-	const [cachedControllerMode, setCachedControllerMode] = createState(false);
+	const gamepadService = Gamepad.get_default();
+	const [cachedControllerMode, setCachedControllerMode] = createState(
+		!!gamepadService.gamepads.length,
+	);
 	const [isLoggingIn, setIsLoggingIn] = createState(false);
 
 	const destroyer = new Destroyer();
@@ -30,6 +34,12 @@ export function LoginSection({ controllerMode, session }: Props) {
 			}
 		}),
 	);
+	destroyer.addDisconnect(
+		gamepadService,
+		gamepadService.connect("notify::gamepads", () => {
+			setCachedControllerMode(true);
+		}),
+	);
 
 	const login = (username: string, password: string, isController: boolean) => {
 		const currentSession = session.get();
@@ -44,7 +54,9 @@ export function LoginSection({ controllerMode, session }: Props) {
 		AstalGreet.login(username, password, currentSession.exec, (_, result) => {
 			try {
 				AstalGreet.login_finish(result);
-			} catch {
+				console.log("Login successful?");
+			} catch (e) {
+				console.error(e);
 				setIsLoggingIn(false);
 			}
 		});

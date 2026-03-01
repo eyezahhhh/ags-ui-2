@@ -12,20 +12,15 @@ import {
 } from "gnim";
 import Gamepad from "@service/gamepad";
 import { Destroyer } from "@util/destroyer";
-import {
-	GamepadPasswordInput,
-	getIsPasswordInputFocused,
-} from "./components/gamepad-password-input/gamepad-password-input.component";
+import { getIsPasswordInputFocused } from "./components/gamepad-password-input/gamepad-password-input.component";
 import { getDesktopSessions } from "@util/desktop-sessions";
 import { IDesktopSession } from "@interface/desktop-session";
 import { SessionSelector } from "./components/session-selector/session-selector.component";
 import { PowerButtonGroup } from "./components/power-button-group/power-button-group.component";
-import { KeyboardPasswordInput } from "./components/keyboard-password-input/keyboard-password-input.component";
 import { LoginSection } from "./components/login-section/login-section.component";
 import { IS_DEV } from "@const/is-dev";
 import { SESSIONS_DIRECTORY } from "@const/sessions-directory";
 import Wallpaper from "@service/wallpaper";
-// import Wallpaper from "@service/wallpaper";
 
 export function GreeterWindow(gdkMonitor: Gdk.Monitor) {
 	const { TOP, BOTTOM, LEFT, RIGHT } = Astal.WindowAnchor;

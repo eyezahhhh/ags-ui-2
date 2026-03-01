@@ -119,7 +119,11 @@ export function GamepadPasswordInput({ isLoggingIn, onLoginAttempt }: Props) {
 							const pressed = button.value == 1;
 							if (buttonsPressed[index] != pressed) {
 								buttonsPressed[index] = pressed;
-								if (!isLoggingIn.get() && pressed) {
+								if (
+									!isLoggingIn.get() &&
+									pressed &&
+									password.peek().length < PASSWORD_LENGTH
+								) {
 									const inputs = password.get();
 									let blockedChars = "";
 									for (
@@ -217,9 +221,9 @@ export function GamepadPasswordInput({ isLoggingIn, onLoginAttempt }: Props) {
 						destroyer.add(
 							gamepad.connectForAllGamepadButtons(
 								"notify::value",
-								(gamepad, button, buttonIndex) => {
+								(gamepad, button) => {
 									if (button.value == 1) {
-										if (buttonIndex == 0) {
+										if (button.button_id == Gamepad.ButtonId.SOUTH) {
 											console.log("Focusing password input");
 											setFocusedController(gamepad);
 										}
