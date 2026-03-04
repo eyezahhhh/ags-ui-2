@@ -190,6 +190,7 @@ export function LauncherWindow() {
 			application={app}
 			namespace={`${CLASS}_launcher`}
 			cssClasses={[styles.window]}
+			layer={Astal.Layer.OVERLAY}
 			// anchor={TOP | RIGHT}
 			$={(self) => {
 				self.connect("notify::visible", (window) => {

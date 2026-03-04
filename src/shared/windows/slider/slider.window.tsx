@@ -65,6 +65,7 @@ export function SliderWindow() {
 			class={CLASS}
 			marginBottom={200}
 			cssClasses={[styles.window]}
+			layer={Astal.Layer.OVERLAY}
 			visible={activeHandler.as((handler) => !!handler?.visible)}
 		>
 			<Gtk.Overlay

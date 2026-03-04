@@ -48,6 +48,7 @@ export function MenuWindow() {
 			namespace={`${CLASS}_menu`}
 			class={CLASS}
 			keymode={Astal.Keymode.ON_DEMAND}
+			layer={Astal.Layer.OVERLAY}
 		>
 			<With value={computedBind}>
 				{([handler, data]) => (

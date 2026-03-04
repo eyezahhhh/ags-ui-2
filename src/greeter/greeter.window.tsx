@@ -157,17 +157,19 @@ export function GreeterWindow(gdkMonitor: Gdk.Monitor) {
 										/>
 									</box>
 									<box>
-										<SessionSelector
-											sessions={sessions}
-											selectedIndex={selectedSessionIndex}
-											onChange={(index) => {
-												const sessionsList = sessions.get();
-												if (sessionsList && sessionsList.length > index) {
-													setSelectedSessionIndex(index);
-													console.log(`Setting selected button:`, index);
-												}
-											}}
-										/>
+										<box hexpand>
+											<SessionSelector
+												sessions={sessions}
+												selectedIndex={selectedSessionIndex}
+												onChange={(index) => {
+													const sessionsList = sessions.get();
+													if (sessionsList && sessionsList.length > index) {
+														setSelectedSessionIndex(index);
+														console.log(`Setting selected button:`, index);
+													}
+												}}
+											/>
+										</box>
 									</box>
 								</box>
 							) as Gtk.Widget,
