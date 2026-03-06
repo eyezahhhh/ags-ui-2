@@ -252,6 +252,12 @@
               '';
             };
 
+            exposeAgs = lib.mkOption {
+              type = lib.types.bool;
+              default = false;
+              description = "Expose the AGS binary in the user's environment.";
+            };
+
             shell = {
               enable = lib.mkEnableOption "Eyezah UI desktop shell";
 
@@ -326,7 +332,9 @@
               }
             ];
 
-            home.packages = [ cfg.package ];
+            home.packages =
+              [ cfg.package ]
+              ++ lib.optional cfg.exposeAgs ags.packages.${pkgs.system}.default;
           };
         };
     };
