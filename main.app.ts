@@ -17,6 +17,8 @@ import { WALLUST_FILE } from "@const/wallust-file";
 import { generateStyles, generateStylesSync, watchStyles } from "@util/app";
 import { makeDirectoryRecursiveSync } from "@util/file";
 import Gio from "gi://Gio?version=2.0";
+import { WorkspacesWindow } from "main/workspaces/workspaces.window";
+import AppRequest from "@service/app-request";
 
 console.log(`ROOT:`, ROOT);
 
@@ -69,6 +71,7 @@ app.start({
 		MenuWindow();
 		LauncherWindow();
 		SliderWindow();
+		WorkspacesWindow();
 
 		monitorFile(`${CACHE_DIRECTORY}/style.css`, () => reloadStyles());
 		monitorFile(WALLUST_FILE, () => {
@@ -90,8 +93,5 @@ app.start({
 			});
 		}
 	},
-	requestHandler: (args, respond) => {
-		console.log(args);
-		respond("");
-	},
+	requestHandler: (...options) => AppRequest.get_default().invoke(...options),
 });

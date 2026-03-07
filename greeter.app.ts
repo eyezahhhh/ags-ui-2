@@ -6,6 +6,7 @@ import { IS_DEV } from "@const/is-dev";
 import { MONITOR_SCALE } from "@const/monitor-scale";
 import { ROOT } from "@const/root";
 import { WALLUST_FILE } from "@const/wallust-file";
+import AppRequest from "@service/app-request";
 import { generateStyles, generateStylesSync } from "@util/app";
 import { createCommandProcess } from "@util/cli";
 import { makeDirectoryRecursiveSync } from "@util/file";
@@ -85,4 +86,5 @@ app.start({
 			);
 		}
 	},
+	requestHandler: (...options) => AppRequest.get_default().invoke(...options),
 });
