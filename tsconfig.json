@@ -43,6 +43,7 @@
     "src/**/*",
     "@girs/**/*",
     "main.app.ts",
-    "greeter.app.ts"
+    "greeter.app.ts",
+    "touchbar.app.ts"
   ]
 }
