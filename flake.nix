@@ -103,6 +103,7 @@
               pkgs.brightnessctl
               pkgs.libqalculate
               pkgs.mozlz4a
+              pkgs.qrencode
             ];
 
             postPatch = ''
@@ -173,6 +174,7 @@
                     pkgs.brightnessctl
                     pkgs.libqalculate
                     pkgs.mozlz4a
+                    pkgs.qrencode
                   ]} \
                   --prefix XDG_DATA_DIRS : ${pkgs.papirus-icon-theme}/share
               done
@@ -232,6 +234,7 @@
               pkgs.brightnessctl
               pkgs.libqalculate
               pkgs.mozlz4a
+              pkgs.qrencode
             ];
 
             buildInputs = [

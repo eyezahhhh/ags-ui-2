@@ -23,6 +23,8 @@ import { BrightnessBarWidget } from "./widgets/brightness/brightness.bar-widget"
 import { DisplayMenuHandler } from "main/menu/handlers/display/display.menu-handler";
 import { TrayBarWidget } from "./widgets/tray/tray.bar-widget";
 import AstalHyprland from "gi://AstalHyprland";
+import { ControlCenterMenuHandler } from "main/menu/handlers/control-center/control-center.menu-handler";
+import { createCursorPointer } from "@util/ags";
 
 Hyprshade.get_default();
 
@@ -32,14 +34,30 @@ export function BarWindow(gdkMonitor: Gdk.Monitor) {
 	const RIGHT_WIDGETS = [
 		// <label label="❤️" />,
 		() => <TrayBarWidget />,
-		() => <VolumeBarWidget onClicked={() => toggleMenu(AudioMenuHandler)} />,
+		() => (
+			<VolumeBarWidget
+				onClicked={() => toggleMenu(AudioMenuHandler, "right")}
+			/>
+		),
 		// <BluetoothBarWidget onClicked={() => toggleMenu(BluetoothMenuHandler)} />,
 		() => (
-			<BrightnessBarWidget onClicked={() => toggleMenu(DisplayMenuHandler)} />
+			<BrightnessBarWidget
+				onClicked={() => toggleMenu(DisplayMenuHandler, "right")}
+			/>
 		),
-		() => <NetworkBarWidget onClicked={() => toggleMenu(NetworkMenuHandler)} />,
-		() => <BatteryBarWidget onClicked={() => toggleMenu(PowerMenuHandler)} />,
-		() => <ClockBarWidget onClicked={() => toggleMenu(TimeMenuHandler)} />,
+		() => (
+			<NetworkBarWidget
+				onClicked={() => toggleMenu(NetworkMenuHandler, "right")}
+			/>
+		),
+		() => (
+			<BatteryBarWidget
+				onClicked={() => toggleMenu(PowerMenuHandler, "right")}
+			/>
+		),
+		() => (
+			<ClockBarWidget onClicked={() => toggleMenu(TimeMenuHandler, "right")} />
+		),
 	] as const;
 
 	const hyprland = AstalHyprland.get_default();
@@ -60,35 +78,47 @@ export function BarWindow(gdkMonitor: Gdk.Monitor) {
 			<box cssClasses={[styles.container]}>
 				<centerbox hexpand>
 					<box $type="start" hexpand>
-						<With value={focusedClient}>
-							{(client: AstalHyprland.Client | null) => {
-								if (!client) {
+						<box>
+							<button
+								onClicked={() => toggleMenu(ControlCenterMenuHandler, "left")}
+								cssClasses={[styles.controlCenter]}
+								cursor={createCursorPointer()}
+							>
+								<image iconName="power-symbolic" />
+							</button>
+						</box>
+
+						<box>
+							<With value={focusedClient}>
+								{(client: AstalHyprland.Client | null) => {
+									if (!client) {
+										return (
+											<box cssClasses={[styles.currentApp]}>
+												<image
+													iconName={getReleaseInfo("LOGO")}
+													cssClasses={[styles.appIcon]}
+												/>
+												<label
+													label={`${GLib.get_host_name()} - ${getReleaseInfo(
+														"PRETTY_NAME",
+													)}`}
+												/>
+											</box>
+										);
+									}
+									const icon = getWindowIcon(client.class);
+
 									return (
 										<box cssClasses={[styles.currentApp]}>
-											<image
-												iconName={getReleaseInfo("LOGO")}
-												cssClasses={[styles.appIcon]}
-											/>
-											<label
-												label={`${GLib.get_host_name()} - ${getReleaseInfo(
-													"PRETTY_NAME",
-												)}`}
-											/>
+											{icon && (
+												<image iconName={icon} cssClasses={[styles.appIcon]} />
+											)}
+											<label label={createBinding(client, "title")} />
 										</box>
 									);
-								}
-								const icon = getWindowIcon(client.class);
-
-								return (
-									<box cssClasses={[styles.currentApp]}>
-										{icon && (
-											<image iconName={icon} cssClasses={[styles.appIcon]} />
-										)}
-										<label label={createBinding(client, "title")} />
-									</box>
-								);
-							}}
-						</With>
+								}}
+							</With>
+						</box>
 					</box>
 					<box $type="end">
 						{RIGHT_WIDGETS.map((widget) => (

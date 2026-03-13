@@ -7,9 +7,10 @@ import { MenuHandler } from "./handlers/menu-handler";
 import { CLASS } from "constants/class.const";
 
 export function MenuWindow() {
-	const { TOP, RIGHT } = Astal.WindowAnchor;
+	const { TOP, LEFT, RIGHT } = Astal.WindowAnchor;
 
 	const [handler, setHandler] = createState<MenuHandler | null>(null);
+	const [anchor, setAnchor] = createState<Astal.WindowAnchor>(TOP);
 
 	const stateAccessor = getActiveHandlerStateAccessor();
 	const disconnect = stateAccessor.subscribe(() => {
@@ -17,6 +18,12 @@ export function MenuWindow() {
 		if (handlerInfo.handler) {
 			for (let handler of MENU_HANDLERS) {
 				if (handler instanceof handlerInfo.handler) {
+					if (handlerInfo.side == "left") {
+						setAnchor(TOP | LEFT);
+					} else {
+						setAnchor(TOP | RIGHT);
+					}
+
 					return setHandler(handler);
 				}
 			}
@@ -38,10 +45,11 @@ export function MenuWindow() {
 
 	const window = (
 		<window
-			anchor={TOP | RIGHT}
+			anchor={anchor}
 			application={app}
 			marginTop={34}
 			marginRight={10}
+			marginLeft={10}
 			cssClasses={[styles.window]}
 			visible={handler.as((handler) => !!handler)}
 			name="menu"

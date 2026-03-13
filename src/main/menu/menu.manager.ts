@@ -8,14 +8,23 @@ import { BluetoothMenuHandler } from "./handlers/bluetooth/bluetooth.menu-handle
 import { TimeMenuHandler } from "./handlers/time/time.menu-handler";
 import { PowerMenuHandler } from "./handlers/power/power.menu-handler";
 import { DisplayMenuHandler } from "./handlers/display/display.menu-handler";
+import { ControlCenterMenuHandler } from "./handlers/control-center/control-center.menu-handler";
 
 const [activeHandler, setActiveHandler] = createState<IMenuHandlerState>({
 	handler: null,
 });
 let visibilityTimer: Timer | null = null;
 
+export function setMenu(handlerClass: null): void;
+export function setMenu(
+	handlerClass: typeof MenuHandler,
+	side: "left" | "right",
+	data?: string | number | null,
+): void;
+
 export function setMenu(
 	handlerClass: typeof MenuHandler | null,
+	side?: "left" | "right",
 	data?: string | number | null,
 ) {
 	visibilityTimer?.cancel();
@@ -25,12 +34,14 @@ export function setMenu(
 			visibilityTimer = timeout(100, () => {
 				setActiveHandler({
 					handler: handlerClass,
+					side: side || "right",
 					data: data ?? null,
 				});
 			});
 		} else {
 			setActiveHandler({
 				handler: handlerClass,
+				side: side || "right",
 				data: data ?? null,
 			});
 			return;
@@ -43,6 +54,7 @@ export function setMenu(
 
 export function toggleMenu(
 	handlerClass: typeof MenuHandler | null,
+	side: "left" | "right",
 	data?: string | number | null,
 ) {
 	const activeHandlerState = activeHandler.get();
@@ -53,7 +65,7 @@ export function toggleMenu(
 	) {
 		setMenu(null);
 	} else {
-		setMenu(handlerClass, data);
+		setMenu(handlerClass!, side, data);
 	}
 }
 
@@ -68,4 +80,5 @@ export const MENU_HANDLERS: MenuHandler[] = [
 	new TimeMenuHandler(),
 	new PowerMenuHandler(),
 	new DisplayMenuHandler(),
+	new ControlCenterMenuHandler(),
 ] as const;

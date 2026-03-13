@@ -10,6 +10,7 @@ import { WORKING_DIRECTORY } from "@const/working-directory";
 import { toSearchParams } from "@util/string";
 import AstalHyprland from "gi://AstalHyprland?version=0.1";
 import styles from "./firefox.launcher-handler.style";
+import { ROOT } from "@const/root";
 
 const MOZLZ4_FILE = `${HOME}/.mozilla/firefox/default/search.json.mozlz4`;
 
@@ -127,9 +128,9 @@ export class FirefoxLauncherHandler extends LauncherHandler {
 					aliases: [engine._metaData.alias || ""].filter(Boolean),
 					url,
 					engine,
-					image: `${WORKING_DIRECTORY}/assets/firefox-search-engines/builtin/${engine._name}.png`,
+					image: `${ROOT}/assets/firefox-search-engines/builtin/${engine._name}.png`,
 				});
-			} else if (engine._urls.length) {
+			} else if (engine._urls?.length) {
 				let url = engine._urls[0].template;
 
 				if (engine._urls[0].params?.length) {

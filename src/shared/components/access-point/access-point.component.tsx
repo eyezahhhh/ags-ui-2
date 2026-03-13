@@ -157,7 +157,11 @@ export function AccessPoint({ ap, onClicked, isOpen }: Props) {
 												<>
 													<ToggleButton
 														onClicked={() =>
-															setMenu(NetworkMenuHandler, `qrcode_${ap.ssid}`)
+															setMenu(
+																NetworkMenuHandler,
+																"right",
+																`qrcode_${ap.ssid}`,
+															)
 														}
 														cssClasses={[styles.extraButton]}
 													>
