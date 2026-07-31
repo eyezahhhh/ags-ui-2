@@ -23,3 +23,7 @@ $text-light: #fff;
 
 $font-main: "Inter";
 $font-monospace: "Kode Mono", monospace;
+
+* {
+	font-family: $font-main;
+}

@@ -44,6 +44,14 @@
           let
             pkgs = nixpkgs.legacyPackages.${system};
 
+            fontPackages = with pkgs; [
+              inter
+              comic-mono
+              oswald
+              roboto
+              kode-mono
+            ];
+
             yaml = pkgs.formats.yaml { };
 
             astalPackages = with ags.packages.${system}; [
@@ -74,6 +82,11 @@
                 pkgs.libmanette
                 pkgs.libgudev
                 pkgs.libvirt-glib
+                pkgs.inter
+                pkgs.comic-mono
+                pkgs.oswald
+                pkgs.roboto
+                pkgs.kode-mono
               ];
           in
           pkgs.buildNpmPackage {
@@ -101,6 +114,11 @@
               pkgs.mozlz4a
               pkgs.qrencode
               pkgs.lm_sensors
+              pkgs.inter
+              pkgs.comic-mono
+              pkgs.oswald
+              pkgs.roboto
+              pkgs.kode-mono
             ];
 
             postPatch = ''
@@ -169,8 +187,13 @@
                     pkgs.mozlz4a
                     pkgs.qrencode
                     pkgs.lm_sensors
+                    pkgs.inter
+                    pkgs.comic-mono
+                    pkgs.oswald
+                    pkgs.roboto
+                    pkgs.kode-mono
                   ]} \
-                  --prefix XDG_DATA_DIRS : ${pkgs.papirus-icon-theme}/share
+                  --prefix XDG_DATA_DIRS : "${pkgs.lib.makeSearchPath "share" ([ pkgs.papirus-icon-theme ] ++ fontPackages)}"
               done
             '';
           };
@@ -182,6 +205,14 @@
 
       devShells = forEachSystem (system: pkgs:
         let
+          fontPackages = with pkgs; [
+            inter
+            comic-mono
+            oswald
+            roboto
+            kode-mono
+          ];
+
           astalPackages = with ags.packages.${system}; [
             io
             astal4
@@ -214,6 +245,10 @@
         in
         {
           default = pkgs.mkShell {
+            FONTCONFIG_FILE = pkgs.makeFontsConf {
+              fontDirectories = map (f: "${f}/share/fonts") fontPackages;
+            };
+
             nativeBuildInputs = [
               pkgs.nodejs_24
               pkgs.imagemagick
