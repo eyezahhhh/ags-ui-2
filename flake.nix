@@ -52,6 +52,14 @@
               kode-mono
             ];
 
+            fontsConf = pkgs.makeFontsConf {
+              fontDirectories = (map (f: "${f}/share/fonts") fontPackages) ++ [
+                "/run/current-system/sw/share/fonts"
+                "~/.local/share/fonts"
+                "~/.nix-profile/share/fonts"
+              ];
+            };
+
             yaml = pkgs.formats.yaml { };
 
             astalPackages = with ags.packages.${system}; [
@@ -175,26 +183,43 @@
               runHook postInstall
             '';
 
-            postFixup = ''
-              for bin in $out/bin/*; do
-                wrapProgram "$bin" \
-                  --prefix PATH : ${pkgs.lib.makeBinPath [
-                    pkgs.nodejs_24
-                    pkgs.wlr-randr
-                    pkgs.imagemagick
-                    pkgs.brightnessctl
-                    pkgs.libqalculate
-                    pkgs.mozlz4a
-                    pkgs.qrencode
-                    pkgs.lm_sensors
-                    pkgs.inter
-                    pkgs.comic-mono
-                    pkgs.oswald
-                    pkgs.roboto
-                    pkgs.kode-mono
-                  ]} \
-                  --prefix XDG_DATA_DIRS : "${pkgs.lib.makeSearchPath "share" ([ pkgs.papirus-icon-theme ] ++ fontPackages)}"
-              done
+            # postFixup = ''
+            #   for bin in $out/bin/*; do
+            #     wrapProgram "$bin" \
+            #       --prefix PATH : ${pkgs.lib.makeBinPath [
+            #         pkgs.nodejs_24
+            #         pkgs.wlr-randr
+            #         pkgs.imagemagick
+            #         pkgs.brightnessctl
+            #         pkgs.libqalculate
+            #         pkgs.mozlz4a
+            #         pkgs.qrencode
+            #         pkgs.lm_sensors
+            #         pkgs.inter
+            #         pkgs.comic-mono
+            #         pkgs.oswald
+            #         pkgs.roboto
+            #         pkgs.kode-mono
+            #       ]} \
+            #       --prefix XDG_DATA_DIRS : "${pkgs.lib.makeSearchPath "share" ([ pkgs.papirus-icon-theme ] ++ fontPackages)}"
+            #   done
+            # '';
+
+            preFixup = ''
+              gappsWrapperArgs+=(
+                --set FONTCONFIG_FILE "${fontsConf}"
+                --prefix PATH : "${pkgs.lib.makeBinPath [
+                  pkgs.nodejs_24
+                  pkgs.wlr-randr
+                  pkgs.imagemagick
+                  pkgs.brightnessctl
+                  pkgs.libqalculate
+                  pkgs.mozlz4a
+                  pkgs.qrencode
+                  pkgs.lm_sensors
+                ]}"
+                --prefix XDG_DATA_DIRS : "${pkgs.lib.makeSearchPath "share" ([ pkgs.papirus-icon-theme ] ++ fontPackages)}"
+              )
             '';
           };
       };
