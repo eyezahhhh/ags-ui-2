@@ -93,9 +93,9 @@ namespace Hyprshade {
 
 		private async _scan(isKilled: () => boolean) {
 			try {
-				console.log("Executing...");
+				// console.log("Executing...");
 				const listOutput = await execAsync(["hyprshade", "ls"]);
-				console.log("Executed");
+				// console.log("Executed");
 				if (isKilled()) {
 					return;
 				}
@@ -166,7 +166,7 @@ namespace Hyprshade {
 					this.notify("shaders");
 				}
 			} catch (e) {
-				console.error(e);
+				// console.error(e);
 			}
 		}
 

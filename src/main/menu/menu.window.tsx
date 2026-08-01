@@ -66,6 +66,7 @@ export function MenuWindow() {
 			class={CLASS}
 			keymode={Astal.Keymode.ON_DEMAND}
 			layer={Astal.Layer.OVERLAY}
+			$={(self) => onCleanup(() => self.destroy())}
 		>
 			<With value={computedBind}>
 				{([handler, data]) => (

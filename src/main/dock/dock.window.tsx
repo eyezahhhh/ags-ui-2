@@ -160,10 +160,6 @@ export function DockWindow({ gdkMonitor }: Props) {
 
 	scanDesktop();
 
-	onCleanup(() => {
-		destroyer.destroy();
-	});
-
 	return (
 		<window
 			visible={visible}
@@ -176,6 +172,12 @@ export function DockWindow({ gdkMonitor }: Props) {
 			layer={Astal.Layer.BOTTOM}
 			cssClasses={[styles.window]}
 			marginBottom={10}
+			$={(self) =>
+				onCleanup(() => {
+					destroyer.destroy();
+					self.destroy();
+				})
+			}
 		>
 			<box cssClasses={[styles.container]}>
 				<For each={entries}>

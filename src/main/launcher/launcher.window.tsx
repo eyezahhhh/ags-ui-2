@@ -149,10 +149,6 @@ export function LauncherWindow() {
 		}),
 	);
 
-	onCleanup(() => {
-		destroyer.destroy();
-	});
-
 	const entry = (
 		<entry
 			cssClasses={[styles.input]}
@@ -202,6 +198,10 @@ export function LauncherWindow() {
 					} else {
 						clearEntries();
 					}
+				});
+				onCleanup(() => {
+					destroyer.destroy();
+					self.destroy();
 				});
 			}}
 		>

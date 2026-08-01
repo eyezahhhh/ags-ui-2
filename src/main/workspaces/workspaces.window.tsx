@@ -301,10 +301,6 @@ export function WorkspacesWindow() {
 
 	updateWorkspaces();
 
-	onCleanup(() => {
-		destroyer.destroy();
-	});
-
 	const window = (
 		<window
 			anchor={TOP | BOTTOM | LEFT | RIGHT}
@@ -320,6 +316,10 @@ export function WorkspacesWindow() {
 					if (self.visible) {
 						self.grab_focus();
 					}
+				});
+				onCleanup(() => {
+					destroyer.destroy();
+					self.destroy();
 				});
 			}}
 			cssClasses={[styles.window]}

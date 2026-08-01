@@ -49,13 +49,6 @@ export function SliderWindow() {
 		destroyer.add(() => handler.removeListener(callback));
 	}
 
-	onCleanup(() => {
-		destroyer.destroy();
-		if (timeout) {
-			clearTimeout(timeout);
-		}
-	});
-
 	return (
 		<window
 			name="slider"
@@ -67,6 +60,15 @@ export function SliderWindow() {
 			cssClasses={[styles.window]}
 			layer={Astal.Layer.OVERLAY}
 			visible={activeHandler.as((handler) => !!handler?.visible)}
+			$={(self) =>
+				onCleanup(() => () => {
+					destroyer.destroy();
+					self.destroy();
+					if (timeout) {
+						clearTimeout(timeout);
+					}
+				})
+			}
 		>
 			<Gtk.Overlay
 				$={(self) => {

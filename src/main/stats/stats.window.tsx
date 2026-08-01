@@ -40,8 +40,6 @@ export function StatsWindow({ gdkMonitor }: Props) {
 		setModules(modules);
 	}
 
-	onCleanup(() => destroyer.destroy());
-
 	return (
 		<window
 			anchor={BOTTOM | RIGHT}
@@ -54,6 +52,12 @@ export function StatsWindow({ gdkMonitor }: Props) {
 			gdkmonitor={gdkMonitor}
 			margin={10}
 			visible
+			$={(self) =>
+				onCleanup(() => {
+					destroyer.destroy();
+					self.destroy();
+				})
+			}
 		>
 			<box orientation={Gtk.Orientation.VERTICAL} valign={Gtk.Align.END}>
 				<For each={modules}>

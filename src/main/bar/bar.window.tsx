@@ -2,7 +2,7 @@ import { Astal, Gdk, Gtk } from "ags/gtk4";
 import { CLASS } from "constants/class.const";
 import styles from "./bar.window.style";
 import app from "ags/gtk4/app";
-import { createBinding } from "gnim";
+import { createBinding, onCleanup } from "gnim";
 import { With } from "ags";
 import { getWindowIcon } from "@util/icon";
 import { getReleaseInfo } from "@util/release-info";
@@ -29,7 +29,11 @@ import AstalBluetooth from "gi://AstalBluetooth?version=0.1";
 
 Hyprshade.get_default();
 
-export function BarWindow(gdkMonitor: Gdk.Monitor) {
+interface Props {
+	gdkMonitor: Gdk.Monitor;
+}
+
+export function BarWindow({ gdkMonitor }: Props) {
 	const { TOP, LEFT, RIGHT } = Astal.WindowAnchor;
 
 	const bluetooth = AstalBluetooth.get_default();
@@ -83,6 +87,7 @@ export function BarWindow(gdkMonitor: Gdk.Monitor) {
 			anchor={TOP | LEFT | RIGHT}
 			application={app}
 			class={CLASS}
+			$={(self) => onCleanup(() => self.destroy())}
 		>
 			<box cssClasses={[styles.container]}>
 				<centerbox hexpand>

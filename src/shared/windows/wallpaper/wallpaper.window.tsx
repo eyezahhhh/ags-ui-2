@@ -2,9 +2,13 @@ import { CLASS } from "@const/class";
 import Wallpaper from "@service/wallpaper";
 import { Astal, Gdk, Gtk } from "ags/gtk4";
 import app from "ags/gtk4/app";
-import { createBinding, With } from "gnim";
+import { createBinding, onCleanup, With } from "gnim";
 
-export function WallpaperWindow(gdkMonitor: Gdk.Monitor) {
+interface Props {
+	gdkMonitor: Gdk.Monitor;
+}
+
+export function WallpaperWindow({ gdkMonitor }: Props) {
 	const { TOP, BOTTOM, LEFT, RIGHT } = Astal.WindowAnchor;
 
 	const wallpaperService = Wallpaper.get_default();
@@ -19,6 +23,7 @@ export function WallpaperWindow(gdkMonitor: Gdk.Monitor) {
 			class={CLASS}
 			layer={Astal.Layer.BACKGROUND}
 			visible
+			$={(self) => onCleanup(() => self.destroy())}
 		>
 			<box hexpand vexpand>
 				<With value={createBinding(wallpaperService, "is_current_set")}>
