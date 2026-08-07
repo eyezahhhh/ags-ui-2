@@ -26,7 +26,7 @@ export function Expandable({ children }: Props) {
 			>
 				<image
 					iconName={show.as((show) =>
-						show ? "pan-up-symbolic" : "pan-down-symbolic",
+						show ? "arrow-up-tiny-symbolic" : "arrow-down-tiny-symbolic",
 					)}
 				/>
 			</button>

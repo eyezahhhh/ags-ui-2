@@ -27,35 +27,37 @@ export function BatteryBarWidget({ onClicked }: Props) {
 		>
 			<box>
 				<image
-					iconName={createComputed(
-						[
-							createBinding(battery, "device_type"),
-							createBinding(battery, "icon_name"),
-						],
-						(type, icon) =>
-							type == AstalBattery.Type.UNKNOWN
-								? "gnome-power-manager-symbolic"
-								: icon,
-					)}
-					cssClasses={createComputed(
-						[
-							createBinding(battery, "percentage"),
-							createBinding(battery, "charging"),
-						],
-						(percent, charging) => {
-							const classes: string[] = [styles.icon];
-							if (percent <= 0.2) {
-								classes.push(styles["percent-danger"]);
-							}
-							if (percent <= 0.3) {
-								classes.push(styles["percent-warning"]);
-							}
-							if (charging) {
-								classes.push(styles["charging"]);
-							}
-							return classes;
-						},
-					)}
+					iconName={createComputed(() => {
+						const type = createBinding(battery, "device_type")();
+						const percent = createBinding(battery, "percentage")();
+						const charging = createBinding(battery, "charging")();
+
+						if (type == AstalBattery.Type.UNKNOWN) {
+							return "gnome-power-manager-symbolic";
+						}
+
+						const percentString = (Math.round(percent * 10) * 10)
+							.toString()
+							.padStart(2, "0");
+
+						return `battery-level-${percentString}${charging ? "-charging" : ""}-symbolic`;
+					})}
+					cssClasses={createComputed(() => {
+						const charging = createBinding(battery, "charging")();
+						const percent = createBinding(battery, "percentage")();
+
+						const classes: string[] = [styles.icon];
+						if (percent <= 0.2) {
+							classes.push(styles["percent-danger"]);
+						}
+						if (percent <= 0.3) {
+							classes.push(styles["percent-warning"]);
+						}
+						if (charging) {
+							classes.push(styles["charging"]);
+						}
+						return classes;
+					})}
 				/>
 				<revealer
 					transitionType={Gtk.RevealerTransitionType.SLIDE_RIGHT}

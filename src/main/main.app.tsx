@@ -36,7 +36,7 @@ const reloadStyles = createDebouncer(() => {
 app.start({
 	css: `${CACHE_DIRECTORY}/style.css`,
 	instanceName: `${CLASS}_main`,
-	iconTheme: "Papirus",
+	iconTheme: "Fluent",
 	main: () => {
 		const enableDock = Config.getBoolean("dock.enable", true);
 

@@ -25,7 +25,7 @@ const WALLUST_FILE = Config.getString("theme.wallustThemeFile");
 app.start({
 	css: `${CACHE_DIRECTORY}/style.css`,
 	instanceName: `${CLASS}_greeter`,
-	iconTheme: "Papirus",
+	iconTheme: "Fluent",
 	cursorTheme: Config.getString("greeter.cursorTheme"),
 	main: () => {
 		makeDirectoryRecursiveSync(Gio.File.new_for_path(CACHE_DIRECTORY));

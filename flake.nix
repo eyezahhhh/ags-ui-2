@@ -87,6 +87,7 @@
                 pkgs.glib-networking
                 pkgs.accountsservice
                 pkgs.papirus-icon-theme
+                pkgs.fluent-icon-theme
                 pkgs.libmanette
                 pkgs.libgudev
                 pkgs.libvirt-glib
@@ -218,7 +219,10 @@
                   pkgs.qrencode
                   pkgs.lm_sensors
                 ]}"
-                --prefix XDG_DATA_DIRS : "${pkgs.lib.makeSearchPath "share" ([ pkgs.papirus-icon-theme ] ++ fontPackages)}"
+                --prefix XDG_DATA_DIRS : "${pkgs.lib.makeSearchPath "share" ([
+                  pkgs.papirus-icon-theme 
+                  pkgs.fluent-icon-theme
+                ] ++ fontPackages)}"
               )
             '';
           };
@@ -289,6 +293,7 @@
                 inherit extraPackages;
               })
               pkgs.papirus-icon-theme
+              pkgs.fluent-icon-theme
             ];
           };
         }

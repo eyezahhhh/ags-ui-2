@@ -72,12 +72,14 @@ namespace Brightness {
 			const percent = this.percent;
 
 			let icon: string;
-			if (percent < 30) {
-				icon = "brightness-low-symbolic";
-			} else if (percent < 70) {
-				icon = "brightness-medium-symbolic";
+			if (percent < 25) {
+				icon = "display-brightness-off-symbolic";
+			} else if (percent < 50) {
+				icon = "display-brightness-low-symbolic";
+			} else if (percent < 75) {
+				icon = "display-brightness-medium-symbolic";
 			} else {
-				icon = "brightness-high-symbolic";
+				icon = "display-brightness-high-symbolic";
 			}
 
 			return icon;

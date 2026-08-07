@@ -12,14 +12,16 @@ export function BrightnessBarWidget({ onClicked }: Props) {
 	const hyprshade = Hyprshade.get_default();
 	const brightness = Brightness.get_default();
 
-	const enabledBinding = createComputed(
-		[createBinding(hyprshade, "shaders"), createBinding(brightness, "primary")],
-		(shaders, brightnessDevice) => !!shaders.length || !!brightnessDevice,
-	);
-
 	return (
-		<With value={enabledBinding}>
-			{(enabled) =>
+		<With
+			value={createComputed(() => {
+				return (
+					!!createBinding(hyprshade, "shaders")().length ||
+					!!createBinding(brightness, "primary")()
+				);
+			})}
+		>
+			{(enabled: boolean) =>
 				enabled && (
 					<box>
 						<With
