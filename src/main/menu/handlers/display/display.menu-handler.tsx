@@ -8,6 +8,8 @@ import Brightness from "@service/brightness";
 import { createCursorPointer } from "@util/ags";
 import styles from "./display.menu-handler.style";
 import sliderStyles from "@styles/slider";
+import OpenRGB from "@service/openrgb";
+import { ControllerData } from "shared/openrgb/types";
 
 export class DisplayMenuHandler extends MenuHandler {
 	constructor() {
@@ -20,6 +22,7 @@ export class DisplayMenuHandler extends MenuHandler {
 	): GObject.Object {
 		const hyprshade = Hyprshade.get_default();
 		const brightness = Brightness.get_default();
+		const openrgb = OpenRGB.get_default();
 
 		return (
 			<box widthRequest={250} orientation={Gtk.Orientation.VERTICAL}>
@@ -72,6 +75,47 @@ export class DisplayMenuHandler extends MenuHandler {
 							/>
 						)}
 					</For>
+				</box>
+				<box>
+					<With value={createBinding(openrgb, "connected")}>
+						{(connected) => (
+							<box orientation={Gtk.Orientation.VERTICAL}>
+								<label
+									label={createBinding(openrgb, "controllers").as(
+										(controllers) =>
+											connected
+												? `Connected to OpenRGB (${controllers.length})`
+												: "Not connected to OpenRGB",
+									)}
+								/>
+								<box orientation={Gtk.Orientation.VERTICAL}>
+									<For each={createBinding(openrgb, "controllers")}>
+										{(value: ControllerData) => {
+											// console.log(value);
+											return (
+												<box>
+													<label label={value.name} />
+													<button
+														onClicked={() =>
+															openrgb
+																.applyColor(value.deviceId, {
+																	r: 255,
+																	g: 255,
+																	b: 0,
+																})
+																.catch(console.error)
+														}
+													>
+														Click
+													</button>
+												</box>
+											);
+										}}
+									</For>
+								</box>
+							</box>
+						)}
+					</With>
 				</box>
 			</box>
 		);

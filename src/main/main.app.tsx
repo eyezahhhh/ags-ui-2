@@ -22,6 +22,7 @@ import Config from "@util/config";
 import { DockWindow } from "main/dock/dock.window";
 import { PERSISTENT_STORAGE_DIRECTORY } from "@const/persistent-storage-directory";
 import { NotificationsWindow } from "main/notifications/notifications.window";
+import OpenRGB from "@service/openrgb";
 
 const WALLUST_FILE = Config.getString("theme.wallustThemeFile");
 
@@ -59,6 +60,7 @@ app.start({
 		});
 
 		WireGuard.get_default(); // load WireGuard before it's visually needed
+		OpenRGB.get_default();
 
 		if (IS_DEV) {
 			console.log("Launched in DEV mode, watching .scss files");
