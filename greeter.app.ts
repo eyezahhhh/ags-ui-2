@@ -3,6 +3,7 @@ import { CLASS } from "@const/class";
 import { IS_DEV } from "@const/is-dev";
 import { ROOT } from "@const/root";
 import AppRequest from "@service/app-request";
+import OpenRGB from "@service/openrgb";
 import { generateStyles, generateStylesSync } from "@util/app";
 import { createCommandProcess } from "@util/cli";
 import Config from "@util/config";
@@ -72,6 +73,8 @@ app.start({
 		if (wlrCommand.length > 1) {
 			exec(wlrCommand);
 		}
+
+		OpenRGB.get_default();
 
 		const monitors = app.get_monitors();
 		GreeterWindow(monitors[monitors.length - 1]);
